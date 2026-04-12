@@ -38,8 +38,9 @@ Install `mishnah-style.skill` from the repo's releases, or install the skill fol
 ## Masechot
 
 | Masechet | Status |
-|----------|--------|
-| Zevachim | Draft |
+| -------- | ------ |
+| Brachot  | Draft  |
+| Zevachim | Draft  |
 
 ## License
 
