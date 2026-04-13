@@ -62,6 +62,13 @@ Install `mishnah-style.skill` from the repo's releases, or install the skill fol
 | Megillah     | Draft  |
 | Moed Katan   | Draft  |
 | Chagigah     | Draft  |
+| Yevamot      | Draft  |
+| Ketubot      | Draft  |
+| Nedarim      | Draft  |
+| Nazir        | Draft  |
+| Sotah        | Draft  |
+| Gittin       | Draft  |
+| Kiddushin    | Draft  |
 | Zevachim     | Draft  |
 
 ## License
