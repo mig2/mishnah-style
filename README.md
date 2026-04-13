@@ -37,10 +37,20 @@ Install `mishnah-style.skill` from the repo's releases, or install the skill fol
 
 ## Masechot
 
-| Masechet | Status |
-| -------- | ------ |
-| Brachot  | Draft  |
-| Zevachim | Draft  |
+| Masechet     | Status |
+| ------------ | ------ |
+| Brachot      | Draft  |
+| Peah         | Draft  |
+| Demai        | Draft  |
+| Kilayim      | Draft  |
+| Sheviit      | Draft  |
+| Terumot      | Draft  |
+| Maaserot     | Draft  |
+| Maaser Sheni | Draft  |
+| Challah      | Draft  |
+| Orlah        | Draft  |
+| Bikkurim     | Draft  |
+| Zevachim     | Draft  |
 
 ## License
 
