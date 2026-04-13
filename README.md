@@ -50,6 +50,18 @@ Install `mishnah-style.skill` from the repo's releases, or install the skill fol
 | Challah      | Draft  |
 | Orlah        | Draft  |
 | Bikkurim     | Draft  |
+| Shabbat      | Draft  |
+| Eruvin       | Draft  |
+| Pesachim     | Draft  |
+| Shekalim     | Draft  |
+| Yoma         | Draft  |
+| Sukkah       | Draft  |
+| Beitzah      | Draft  |
+| Rosh Hashanah| Draft  |
+| Taanit       | Draft  |
+| Megillah     | Draft  |
+| Moed Katan   | Draft  |
+| Chagigah     | Draft  |
 | Zevachim     | Draft  |
 
 ## License
