@@ -5,7 +5,7 @@ A house style for Mishnah text — clear punctuation, elegant layout, and struct
 This repo contains:
 
 - **A Claude skill** (`skill/`) for formatting Mishnah text from Sefaria into styled HTML
-- **Formatted masechot** (`masechot/`) — the outputs, one HTML file per masechet
+- **[Formatted masechot](masechot/)** — the outputs, one HTML file per masechet
 - **A style guide** (`skill/references/style-guide.md`) — the authoritative formatting reference
 
 ## The Style
