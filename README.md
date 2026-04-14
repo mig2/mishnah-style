@@ -37,49 +37,49 @@ Install `mishnah-style.skill` from the repo's releases, or install the skill fol
 
 ## Masechot
 
-| Masechet     | Status |
-| ------------ | ------ |
-| Brachot      | Draft  |
-| Peah         | Draft  |
-| Demai        | Draft  |
-| Kilayim      | Draft  |
-| Sheviit      | Draft  |
-| Terumot      | Draft  |
-| Maaserot     | Draft  |
-| Maaser Sheni | Draft  |
-| Challah      | Draft  |
-| Orlah        | Draft  |
-| Bikkurim     | Draft  |
-| Shabbat      | Draft  |
-| Eruvin       | Draft  |
-| Pesachim     | Draft  |
-| Shekalim     | Draft  |
-| Yoma         | Draft  |
-| Sukkah       | Draft  |
-| Beitzah      | Draft  |
-| Rosh Hashanah| Draft  |
-| Taanit       | Draft  |
-| Megillah     | Draft  |
-| Moed Katan   | Draft  |
-| Chagigah     | Draft  |
-| Yevamot      | Draft  |
-| Ketubot      | Draft  |
-| Nedarim      | Draft  |
-| Nazir        | Draft  |
-| Sotah        | Draft  |
-| Gittin       | Draft  |
-| Kiddushin    | Draft  |
-| Bava Kamma   | Draft  |
-| Bava Metzia  | Draft  |
-| Bava Batra   | Draft  |
-| Sanhedrin    | Draft  |
-| Makkot       | Draft  |
-| Shevuot      | Draft  |
-| Eduyot       | Draft  |
-| Avodah Zarah | Draft  |
-| Avot         | Draft  |
-| Horayot      | Draft  |
-| Zevachim     | Draft  |
+| Masechet     | Skill Version |
+| ------------ | ------------- |
+| Brachot      | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Peah         | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Demai        | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Kilayim      | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Sheviit      | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Terumot      | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Maaserot     | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Maaser Sheni | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Challah      | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Orlah        | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Bikkurim     | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Shabbat      | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Eruvin       | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Pesachim     | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Shekalim     | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Yoma         | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Sukkah       | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Beitzah      | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Rosh Hashanah| [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Taanit       | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Megillah     | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Moed Katan   | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Chagigah     | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Yevamot      | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Ketubot      | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Nedarim      | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Nazir        | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Sotah        | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Gittin       | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Kiddushin    | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Bava Kamma   | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Bava Metzia  | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Bava Batra   | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Sanhedrin    | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Makkot       | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Shevuot      | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Eduyot       | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Avodah Zarah | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Avot         | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Horayot      | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) |
+| Zevachim     | — |
 
 ## License
 
