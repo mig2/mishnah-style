@@ -69,6 +69,16 @@ Install `mishnah-style.skill` from the repo's releases, or install the skill fol
 | Sotah        | Draft  |
 | Gittin       | Draft  |
 | Kiddushin    | Draft  |
+| Bava Kamma   | Draft  |
+| Bava Metzia  | Draft  |
+| Bava Batra   | Draft  |
+| Sanhedrin    | Draft  |
+| Makkot       | Draft  |
+| Shevuot      | Draft  |
+| Eduyot       | Draft  |
+| Avodah Zarah | Draft  |
+| Avot         | Draft  |
+| Horayot      | Draft  |
 | Zevachim     | Draft  |
 
 ## License
