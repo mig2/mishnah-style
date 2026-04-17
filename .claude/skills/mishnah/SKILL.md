@@ -20,15 +20,46 @@ https://www.sefaria.org/api/v3/texts/Mishnah_{Tractate}.{Chapter}
 ```
 The response JSON has `versions[0].text` containing an array of mishnayot.
 
-If `curl` or `WebFetch` is blocked by the network proxy, use Chrome browser MCP tools as a workaround: navigate to the API URL via JavaScript and extract the text from the page.
+**Preferred method**: Use `curl` piped through a Python script to strip HTML tags and extract clean text. This avoids WebFetch's AI summarizer, which may truncate long mishnayot or refuse to return full text:
+
+```bash
+curl -s 'https://www.sefaria.org/api/v3/texts/Mishnah_{Tractate}.{Chapter}' | python3 -c "
+import json, sys, re
+data = json.load(sys.stdin)
+texts = data['versions'][0]['text']
+for i, t in enumerate(texts):
+    clean = re.sub(r'<[^>]+>', '', t)
+    print(f'{i+1}. {clean}')
+"
+```
+
+**Fallback**: WebFetch works for shorter chapters but may summarize or refuse long ones. If using WebFetch, explicitly request "COMPLETE text, every word, do NOT truncate."
+
+**Sefaria transliterations** can be tricky. If a 404 occurs, try alternate spellings (e.g. `Oktzin` not `Uktzin`, `Tevul_Yom` with underscore).
 
 ## HTML structure
 
 Each masechet gets a single HTML file with:
 - RTL direction, Hebrew serif fonts
+- Meta tags for skill version and formatted date
 - Title: מסכת {name}
 - Tight TOC: "א, ב, ג..." linking to each perek (no mishna-level TOC)
 - Anchor IDs on every perek (`id="perek-N"`) and mishna (`id="mishna-N-M"`) for deep-linking from external apps
+
+### Meta tags (required)
+
+Every generated HTML file must include these meta tags in the `<head>`:
+
+```html
+<meta name="mishnah-style-version" content="{GIT_SHA}">
+<meta name="formatted-date" content="{YYYY-MM-DD}">
+```
+
+Use the current short SHA of HEAD (`git rev-parse --short HEAD`) for the version, and today's date. These allow tracking which skill version produced each file.
+
+### Template
+
+Use an existing masechet file (e.g. `masechot/kinnim.html`) as the CSS/HTML template. Copy the exact `<style>` block — do not invent new styles.
 
 ```html
 <div class="perek" id="perekN">
@@ -53,11 +84,6 @@ Formatting Mishnah is EDITORIAL work, not mechanical text processing. For each m
 2. **Identify the rhetorical structure.** Case vs. ruling, opinion vs. counter-opinion, question vs. answer, parallel formulations.
 3. **Then punctuate and lay out.** Apply the style guide rules with the structure in mind. Every em-dash placement, every line break, every colon should reflect the mishna's logic.
 
-When dispatching subagents for batch formatting, always include:
-- The full style guide text (or path to read it)
-- The exemplar HTML (or path to read it)
-- Explicit instructions that this is editorial work requiring structural reading
-
 ## Key rules (quick reference — the style guide has full details)
 
 - **Bold** only rabbinic names (not verbs like אוֹמֵר). Include collective bodies (חֲכָמִים, שִׁבְעִים וּשְׁנַיִם זָקֵן, בֵּית דִּין).
@@ -68,3 +94,29 @@ When dispatching subagents for batch formatting, always include:
 - **כֵּיצַד** — ? at the end of the full question, not always right after the word.
 - **~8 words per line**, breaking at syntactic joints. Em-dash phrases may exceed this.
 - **Full stop** between opposing opinions (דִּבְרֵי רַבִּי X. וַחֲכָמִים אוֹמְרִים).
+
+### Line length — common mistake
+
+**Do NOT over-break lines.** The ~8 word target means 6–10 words per line. If a clause is only 3–4 words, combine it with the next clause on one line. Short parallel clauses like "חַטַּאת הָעוֹף נַעֲשֵׂית לְמַטָּה, וְחַטַּאת בְּהֵמָה לְמַעְלָה" belong on ONE line (~7 words), not two lines of 4 and 3.
+
+**After formatting, scan for lines under 5 words and combine where syntactically natural.**
+
+## Workflow: formatting a full seder
+
+### Do NOT use parallel agents
+
+Masechet formatting is output-heavy work. Each file is 300–1500 lines of nikkud-marked Hebrew HTML. Hebrew tokenizes 2–3x worse than English/code. Parallel agents will hit rate limits and waste tokens. See `docs/token-analysis-kodashim.md` for data.
+
+### Recommended workflow
+
+1. **Work sequentially**, one masechet at a time from the main thread
+2. **Fetch all raw text first** for a masechet (cheap input tokens), save to a checkpoint file
+3. **Then format and write** the HTML (expensive output tokens)
+4. **Save intermediate state** — if the masechet is large (10+ chapters), write in incremental edits (chapters 1–5, then 6–10, etc.) so a rate limit doesn't lose all work
+5. **Start with the largest masechot** when the rate-limit window is fresh
+6. **Budget ~5–8k tokens per chapter**. A 14-chapter masechet costs ~40–80k tokens. A full seder of 11 masechot may span 2–3 sessions.
+
+### After each masechet
+
+- Update `masechot/index.html` with the new entry
+- Update `README.md` table with the masechet, skill version, and date
