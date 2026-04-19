@@ -101,6 +101,7 @@ Install `mishnah-style.skill` from the repo's releases, or install the skill fol
 | [Taharot](masechot/taharot.html) | [`a2ba912`](https://github.com/mig2/mishnah-style/tree/a2ba912/.claude/skills/mishnah) | 2026-04-19 |
 | [Mikvaot](masechot/mikvaot.html) | [`a2ba912`](https://github.com/mig2/mishnah-style/tree/a2ba912/.claude/skills/mishnah) | 2026-04-19 |
 | [Niddah](masechot/niddah.html) | [`a2ba912`](https://github.com/mig2/mishnah-style/tree/a2ba912/.claude/skills/mishnah) | 2026-04-19 |
+| [Keilim](masechot/keilim.html) | [`a2ba912`](https://github.com/mig2/mishnah-style/tree/a2ba912/.claude/skills/mishnah) | 2026-04-19 |
 
 ## License
 
