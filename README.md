@@ -90,6 +90,17 @@ Install `mishnah-style.skill` from the repo's releases, or install the skill fol
 | [Tamid](masechot/tamid.html) | [`d0ddbf8`](https://github.com/mig2/mishnah-style/tree/d0ddbf8/.claude/skills/mishnah) | 2026-04-16 |
 | [Middot](masechot/middot.html) | [`d0ddbf8`](https://github.com/mig2/mishnah-style/tree/d0ddbf8/.claude/skills/mishnah) | 2026-04-16 |
 | [Kinnim](masechot/kinnim.html) | [`d0ddbf8`](https://github.com/mig2/mishnah-style/tree/d0ddbf8/.claude/skills/mishnah) | 2026-04-16 |
+| [Ohalot](masechot/ohalot.html) | [`a2ba912`](https://github.com/mig2/mishnah-style/tree/a2ba912/.claude/skills/mishnah) | 2026-04-17 |
+| [Makhshirin](masechot/makhshirin.html) | [`a2ba912`](https://github.com/mig2/mishnah-style/tree/a2ba912/.claude/skills/mishnah) | 2026-04-17 |
+| [Zavim](masechot/zavim.html) | [`a2ba912`](https://github.com/mig2/mishnah-style/tree/a2ba912/.claude/skills/mishnah) | 2026-04-17 |
+| [Tevul Yom](masechot/tevul-yom.html) | [`a2ba912`](https://github.com/mig2/mishnah-style/tree/a2ba912/.claude/skills/mishnah) | 2026-04-17 |
+| [Yadayim](masechot/yadayim.html) | [`a2ba912`](https://github.com/mig2/mishnah-style/tree/a2ba912/.claude/skills/mishnah) | 2026-04-17 |
+| [Uktzin](masechot/uktzin.html) | [`a2ba912`](https://github.com/mig2/mishnah-style/tree/a2ba912/.claude/skills/mishnah) | 2026-04-17 |
+| [Negaim](masechot/negaim.html) | [`a2ba912`](https://github.com/mig2/mishnah-style/tree/a2ba912/.claude/skills/mishnah) | 2026-04-19 |
+| [Parah](masechot/parah.html) | [`a2ba912`](https://github.com/mig2/mishnah-style/tree/a2ba912/.claude/skills/mishnah) | 2026-04-19 |
+| [Taharot](masechot/taharot.html) | [`a2ba912`](https://github.com/mig2/mishnah-style/tree/a2ba912/.claude/skills/mishnah) | 2026-04-19 |
+| [Mikvaot](masechot/mikvaot.html) | [`a2ba912`](https://github.com/mig2/mishnah-style/tree/a2ba912/.claude/skills/mishnah) | 2026-04-19 |
+| [Niddah](masechot/niddah.html) | [`a2ba912`](https://github.com/mig2/mishnah-style/tree/a2ba912/.claude/skills/mishnah) | 2026-04-19 |
 
 ## License
 
