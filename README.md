@@ -79,8 +79,8 @@ Install `mishnah-style.skill` from the repo's releases, or install the skill fol
 | [Avodah Zarah](masechot/avodah-zarah.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-14 |
 | [Avot](masechot/avot.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-14 |
 | [Horayot](masechot/horayot.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-14 |
-| [Zevachim](masechot/zevachim.html) | [`d0ddbf8`](https://github.com/mig2/mishnah-style/tree/d0ddbf8/.claude/skills/mishnah) | 2026-04-16 |
-| [Menachot](masechot/menachot.html) | [`d0ddbf8`](https://github.com/mig2/mishnah-style/tree/d0ddbf8/.claude/skills/mishnah) | 2026-04-16 |
+| [Zevachim](masechot/zevachim.html) | [`3508f92`](https://github.com/mig2/mishnah-style/tree/3508f92/.claude/skills/mishnah) | 2026-04-20 |
+| [Menachot](masechot/menachot.html) | [`3508f92`](https://github.com/mig2/mishnah-style/tree/3508f92/.claude/skills/mishnah) | 2026-04-20 |
 | [Chullin](masechot/chullin.html) | [`d0ddbf8`](https://github.com/mig2/mishnah-style/tree/d0ddbf8/.claude/skills/mishnah) | 2026-04-16 |
 | [Bekhorot](masechot/bekhorot.html) | [`d0ddbf8`](https://github.com/mig2/mishnah-style/tree/d0ddbf8/.claude/skills/mishnah) | 2026-04-16 |
 | [Arakhin](masechot/arakhin.html) | [`d0ddbf8`](https://github.com/mig2/mishnah-style/tree/d0ddbf8/.claude/skills/mishnah) | 2026-04-16 |
