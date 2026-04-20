@@ -38,6 +38,11 @@ Em-dashes set off a ruling from its case, or mark a logical turn. Their placemen
 
 **ABSOLUTE RULE**: An em-dash must NEVER appear at the beginning of a line. If a line would start with —, either pull the dash onto the end of the previous line (even exceeding ~8 words) or restructure the break earlier (e.g. break after a colon).
 
+**Visual wrapping**: A dash at the end of a very long line (12+ words) may wrap to its own visual line in the browser, even though the source has it on the same line. This is just as bad as starting a line with —. If a case clause is long enough that the trailing dash would wrap, break the clause earlier so the dash sits on a shorter line:
+  ✗ כָּל הַקֳּדָשִׁים שֶׁהִקְדִּישָׁן בִּשְׁעַת אִסּוּר בָּמוֹת וְהִקְרִיבָן בִּשְׁעַת אִסּוּר בָּמוֹת בַּחוּץ —
+  ✓ כָּל הַקֳּדָשִׁים שֶׁהִקְדִּישָׁן בִּשְׁעַת אִסּוּר בָּמוֹת [break]
+    וְהִקְרִיבָן בִּשְׁעַת אִסּוּר בָּמוֹת בַּחוּץ —
+
 Ask yourself: does what follows the dash complete the preceding phrase (bind tight), or does it begin a new unit (break after dash)? Structural echoes and rhetorical parallels between lines matter more than a fixed word count.
 
 ## 2. Bolding
@@ -63,6 +68,10 @@ Italicize ONLY direct Tanakh quotations. Keep biblical references (book/chapter)
 
 Pay close attention to whether כֵּיצַד stands alone or is mid-sentence:
 - **Standalone**: כֵּיצַד? on its own line, answer begins next line
+- **Case-opener**: When כֵּיצַד? immediately introduces a specific case rather than a general "how so?", join it with the opening of the case on the same line to avoid a 1-word line:
+  ✓ כֵּיצַד? הַשּׁוֹחֵט אֶת הַתּוֹדָה
+  ✗ כֵּיצַד? [alone on line]
+    הַשּׁוֹחֵט אֶת הַתּוֹדָה [next line]
 - **Mid-question**: the ? goes at the end of the FULL question:
   ✓ חַטַּאת הָעוֹף, כֵּיצַד הָיְתָה נַעֲשֵׂית?
   ✗ חַטַּאת הָעוֹף כֵּיצַד? הָיְתָה נַעֲשֵׂית?

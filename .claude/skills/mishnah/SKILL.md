@@ -88,10 +88,10 @@ Formatting Mishnah is EDITORIAL work, not mechanical text processing. For each m
 
 - **Bold** only rabbinic names (not verbs like אוֹמֵר). Include collective bodies (חֲכָמִים, שִׁבְעִים וּשְׁנַיִם זָקֵן, בֵּית דִּין).
 - **Colons** after אוֹמֵר:, before כֵּיצַד?, after זֶה הַכְּלָל:, before enumerations.
-- **Em-dashes** — structural, not mechanical. Bind tight when the ruling completes the case; break after the dash when what follows starts a new unit. NEVER begin a line with —.
+- **Em-dashes** — structural, not mechanical. Bind tight when the ruling completes the case; break after the dash when what follows starts a new unit. NEVER begin a line with —. Also watch for long case clauses (12+ words) where a trailing dash would visually wrap to its own line — break the clause earlier so the dash sits on a shorter line.
 - **״…״** only for performative speech and referenced terms. Never for rabbinic dialogue.
 - **Italics** only for Tanakh quotations.
-- **כֵּיצַד** — ? at the end of the full question, not always right after the word.
+- **כֵּיצַד** — ? at the end of the full question, not always right after the word. When כֵּיצַד? introduces a specific case (not a general "how so?"), join it with the case opening on the same line to avoid a 1-word line.
 - **~8 words per line**, breaking at syntactic joints. Em-dash phrases may exceed this.
 - **Full stop** between opposing opinions (דִּבְרֵי רַבִּי X. וַחֲכָמִים אוֹמְרִים).
 
