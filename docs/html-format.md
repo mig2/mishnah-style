@@ -28,8 +28,10 @@ Each masechet is a single self-contained HTML file. This document describes the 
 
 | Name | Description |
 | --- | --- |
-| `mishnah-style-version` | Short git SHA of the latest commit touching `.claude/skills/mishnah/` at the time the file was generated. |
-| `formatted-date` | ISO 8601 date (`YYYY-MM-DD`) when the file was generated. |
+| `mishnah-style-version` | Short git SHA of HEAD (`git rev-parse --short HEAD`) at the time the file was generated or last edited. |
+| `formatted-date` | ISO 8601 date (`YYYY-MM-DD`) when the file was generated or last edited. |
+
+When a masechet file is edited, update both meta tags to the current SHA and date.
 
 ## Page elements
 
@@ -137,3 +139,9 @@ rosh-hashanah.html
 maaser-sheni.html
 avodah-zarah.html
 ```
+
+## Repo bookkeeping
+
+After creating or editing a masechet file:
+- Update `masechot/index.html` with the entry (link to the HTML file, Hebrew name)
+- Update the `README.md` table with the masechet name, skill version SHA link, and date
