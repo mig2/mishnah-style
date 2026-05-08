@@ -8,12 +8,12 @@ Formatting 11 masechot of Seder Kodashim hit Claude rate limits repeatedly. The 
 
 ## Token profile: coding vs. Mishnah formatting
 
-| | Coding | Mishnah formatting |
-|---|---|---|
-| **Input** | Read files, grep, git log — heavy | Style guide + WebFetch chapter text — moderate |
-| **Output** | Small Edit diffs — light | Full file Write of 600-1500 lines Hebrew HTML — very heavy |
-| **Ratio** | ~90% input, ~10% output | ~30% input, ~70% output |
-| **Tokenization** | English/code: 1-2 tokens/word | Hebrew with nikkud: 3-6 tokens/word |
+|                  | Coding                            | Mishnah formatting                                         |
+| ---------------- | --------------------------------- | ---------------------------------------------------------- |
+| **Input**        | Read files, grep, git log — heavy | Style guide + WebFetch chapter text — moderate             |
+| **Output**       | Small Edit diffs — light          | Full file Write of 600-1500 lines Hebrew HTML — very heavy |
+| **Ratio**        | ~90% input, ~10% output           | ~30% input, ~70% output                                    |
+| **Tokenization** | English/code: 1-2 tokens/word     | Hebrew with nikkud: 3-6 tokens/word                        |
 
 A single masechet Write (e.g. Zevachim at 1527 lines) may cost 60-80k output tokens, where a 1500-line code file would cost 20-30k.
 
@@ -21,22 +21,22 @@ A single masechet Write (e.g. Zevachim at 1527 lines) may cost 60-80k output tok
 
 ### Phase 1: First batch (11 parallel agents)
 
-| Agent | Tokens | Result |
-|-------|--------|--------|
-| Chullin | 120,834 | Couldn't write (permissions) |
-| Keritot | 84,737 | Couldn't write (permissions) |
-| Temurah | 79,855 | Couldn't write (permissions) |
-| Meilah | 67,504 | Couldn't write (permissions) |
-| Kinnim | 49,655 | Couldn't write (permissions) |
-| Kinnim retry | 50,087 | Couldn't write (permissions) |
-| Zevachim | 91 | Rate limit |
-| Menachot | 91 | Rate limit |
-| Bekhorot | 332 | Rate limit |
-| Arakhin | 97 | Rate limit |
-| Tamid | 92 | Rate limit |
-| Middot | 275 | Rate limit |
-| Meilah retry | 213 | Rate limit |
-| Temurah retry | 155 | Rate limit |
+| Agent         | Tokens  | Result                       |
+| ------------- | ------- | ---------------------------- |
+| Chullin       | 120,834 | Couldn't write (permissions) |
+| Keritot       | 84,737  | Couldn't write (permissions) |
+| Temurah       | 79,855  | Couldn't write (permissions) |
+| Meilah        | 67,504  | Couldn't write (permissions) |
+| Kinnim        | 49,655  | Couldn't write (permissions) |
+| Kinnim retry  | 50,087  | Couldn't write (permissions) |
+| Zevachim      | 91      | Rate limit                   |
+| Menachot      | 91      | Rate limit                   |
+| Bekhorot      | 332     | Rate limit                   |
+| Arakhin       | 97      | Rate limit                   |
+| Tamid         | 92      | Rate limit                   |
+| Middot        | 275     | Rate limit                   |
+| Meilah retry  | 213     | Rate limit                   |
+| Temurah retry | 155     | Rate limit                   |
 
 **Total: ~454k tokens, 0 files written.**
 
