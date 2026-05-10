@@ -55,6 +55,17 @@ python3 scripts/format.py masechet Berakhot --chapter 1
 
 Output goes to `output/`. Progress tracking shows completion percentage and ETA.
 
+### Verify against source
+
+```bash
+python3 scripts/verify.py masechet Berakhot            # single tractate
+python3 scripts/verify.py masechet Berakhot --chapter 3 # single chapter
+python3 scripts/verify.py shas                          # all of Shas
+python3 scripts/verify.py shas --report output/report   # with JSON + HTML reports
+```
+
+Compares words in `masechot/*.html` against the downloaded Sefaria JSON to detect hallucinated, missing, or altered text. With `--report PATH`, writes `PATH.json` (structured data) and `PATH.html` (styled report with summary table and per-mishna diffs).
+
 ## Using the Claude Code Skill
 
 ```bash
