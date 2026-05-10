@@ -49,8 +49,11 @@ python3 scripts/format.py masechet Berakhot --backend anthropic
 # Claude Code headless
 python3 scripts/format.py masechet Berakhot --backend claude-code
 
-# Single chapter for testing
-python3 scripts/format.py masechet Berakhot --chapter 1
+# Single chapter
+python3 scripts/format.py masechet Berakhot --ref 3
+
+# Single mishna
+python3 scripts/format.py masechet Berakhot --ref 3:5
 ```
 
 Output goes to `output/`. Progress tracking shows completion percentage and ETA.

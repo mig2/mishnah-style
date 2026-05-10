@@ -459,8 +459,9 @@ def main():
     parser.add_argument("scope", choices=["masechet"],
                         help="What to format")
     parser.add_argument("name", help="Tractate name")
-    parser.add_argument("--chapter", type=int, default=None,
-                        help="Format only this chapter")
+    parser.add_argument("--ref", default=None,
+                        help="Limit scope: chapter number (e.g. 3) or "
+                             "chapter:mishna (e.g. 3:5)")
     parser.add_argument("--backend", choices=["ollama", "anthropic", "claude-code"],
                         default="ollama", help="LLM backend (default: ollama)")
     parser.add_argument("--model", default=None,
@@ -481,7 +482,17 @@ def main():
         sys.exit(1)
     seder, tractate, num_chapters = result
 
-    chapters = [args.chapter] if args.chapter else list(range(1, num_chapters + 1))
+    # Parse --ref
+    ref_chapter = None
+    ref_mishna = None
+    if args.ref:
+        if ':' in args.ref:
+            parts = args.ref.split(':')
+            ref_chapter = int(parts[0])
+            ref_mishna = int(parts[1])
+        else:
+            ref_chapter = int(args.ref)
+    chapters = [ref_chapter] if ref_chapter else list(range(1, num_chapters + 1))
 
     # Load style context
     editorial_guide, exemplar = load_style_guides()
@@ -501,10 +512,14 @@ def main():
             sys.exit(1)
 
     masechet_he = get_masechet_he(seder, tractate, args.dir)
-    total = count_total_mishnayot(seder, tractate, chapters, args.dir)
+    if ref_mishna:
+        total = 1
+    else:
+        total = count_total_mishnayot(seder, tractate, chapters, args.dir)
 
     print(f"Formatting {tractate} ({masechet_he})")
-    print(f"  Chapters {chapters[0]}-{chapters[-1]}, {total} mishnayot")
+    scope_desc = args.ref if args.ref else f"chapters {chapters[0]}-{chapters[-1]}"
+    print(f"  {scope_desc}, {total} mishnayot")
     print(f"  Backend: {args.backend}" +
           (f", model: {model}" if model else ""))
 
@@ -519,6 +534,11 @@ def main():
         formatted_mishnayot = []
         for m_idx, raw_text in enumerate(raw_mishnayot, 1):
             label = f"{hebrew_numeral(ch)}:{hebrew_numeral(m_idx)}"
+
+            # Skip mishnayot outside --ref scope
+            if ref_mishna and m_idx != ref_mishna:
+                formatted_mishnayot.append(None)  # placeholder
+                continue
 
             if args.dry_run:
                 print(f"    {label}: {raw_text[:60]}...")
@@ -547,10 +567,27 @@ def main():
     elapsed = time.time() - start_time
 
     if args.dry_run:
-        print("\nDry run complete — no HTML generated.")
+        print("\nDry run complete — no output generated.")
         return
 
-    # Get git SHA
+    # Single-mishna mode: output just the formatted text fragment
+    if ref_mishna:
+        formatted_texts = [t for t in all_chapters[0] if t is not None]
+        if formatted_texts:
+            filename = MASECHET_FILENAMES.get(tractate, tractate.lower())
+            out_dir = os.path.join(args.dir, "output")
+            os.makedirs(out_dir, exist_ok=True)
+            out_path = os.path.join(out_dir,
+                                    f"{filename}_{ref_chapter}_{ref_mishna}.txt")
+            with open(out_path, "w") as f:
+                f.write(formatted_texts[0])
+
+            mins, secs = divmod(int(elapsed), 60)
+            print(f"\nDone in {mins}m{secs:02d}s")
+            print(f"  Written: {out_path}")
+        return
+
+    # Full/chapter mode: assemble complete HTML
     try:
         git_sha = subprocess.check_output(
             ["git", "rev-parse", "--short", "HEAD"],
@@ -559,7 +596,12 @@ def main():
     except Exception:
         git_sha = "unknown"
 
-    html = build_html(masechet_he, all_chapters, git_sha, date.today().isoformat())
+    # Filter out None placeholders (shouldn't happen in full mode, but safe)
+    clean_chapters = []
+    for ch_data in all_chapters:
+        clean_chapters.append([t for t in ch_data if t is not None])
+
+    html = build_html(masechet_he, clean_chapters, git_sha, date.today().isoformat())
 
     filename = MASECHET_FILENAMES.get(tractate, tractate.lower())
     out_dir = os.path.join(args.dir, "output")
@@ -568,10 +610,10 @@ def main():
     with open(out_path, "w") as f:
         f.write(html)
 
-    total_mishnayot = sum(len(ch) for ch in all_chapters)
+    total_mishnayot = sum(len(ch) for ch in clean_chapters)
     mins, secs = divmod(int(elapsed), 60)
     print(f"\nDone in {mins}m{secs:02d}s")
-    print(f"  {len(all_chapters)} chapters, {total_mishnayot} mishnayot")
+    print(f"  {len(clean_chapters)} chapters, {total_mishnayot} mishnayot")
     print(f"  Written: {out_path}")
 
 
