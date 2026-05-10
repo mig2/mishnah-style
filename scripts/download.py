@@ -106,14 +106,37 @@ SEDARIM = {
     ],
 }
 
+# Aliases: common alternate spellings → canonical Sefaria name
+_ALIASES = {
+    "brachot": "Berakhot", "berachot": "Berakhot", "brachoth": "Berakhot",
+    "maaserot": "Maasrot", "maserot": "Maasrot",
+    "ohalot": "Ohalot", "oholot": "Ohalot",
+    "uktzin": "Oktzin", "uktzim": "Oktzin",
+    "keilim": "Kelim",
+    "shvuot": "Shevuot", "shvuos": "Shevuot",
+    "pesahim": "Pesachim",
+    "bekhorot": "Bekhorot", "bechorot": "Bekhorot",
+    "arachin": "Arakhin",
+    "midot": "Middot",
+    "keritut": "Keritot",
+}
+
 # Flat lookup: lowercase name → (seder, sefaria_name, chapters)
 TRACTATE_LOOKUP = {}
 for seder, tractates in SEDARIM.items():
     for sefaria_name, chapters in tractates:
+        val = (seder, sefaria_name, chapters)
         key = sefaria_name.lower().replace("_", " ")
-        TRACTATE_LOOKUP[key] = (seder, sefaria_name, chapters)
-        # Also index without underscores and with underscores
-        TRACTATE_LOOKUP[sefaria_name.lower()] = (seder, sefaria_name, chapters)
+        TRACTATE_LOOKUP[key] = val
+        TRACTATE_LOOKUP[sefaria_name.lower()] = val
+
+# Add aliases
+for alias, canonical in _ALIASES.items():
+    if canonical in {name for _, names in SEDARIM.items() for name, _ in names}:
+        for seder, tractates in SEDARIM.items():
+            for sefaria_name, chapters in tractates:
+                if sefaria_name == canonical:
+                    TRACTATE_LOOKUP[alias] = (seder, sefaria_name, chapters)
 
 
 def output_dir(seder, tractate):

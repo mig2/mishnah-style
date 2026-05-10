@@ -4,9 +4,13 @@ A house style for Mishnah text — clear punctuation, elegant layout, and struct
 
 This repo contains:
 
-- **A Claude skill** (`skill/`) for formatting Mishnah text from Sefaria into styled HTML
-- **[Formatted masechot](masechot/)** — the outputs, one HTML file per masechet
-- **A style guide** (`skill/references/style-guide.md`) — the authoritative formatting reference
+- **[Formatted masechot](masechot/)** — one HTML file per masechet, all 63 tractates
+- **[Editorial style guide](docs/editorial-style.md)** — the authoritative formatting rules
+- **[HTML format spec](docs/html-format.md)** — HTML structure, anchors, CSS conventions
+- **Scripts** for downloading source text and formatting via LLM:
+  - `scripts/download.py` — fetch raw JSON from Sefaria API
+  - `scripts/format.py` — format JSON→HTML using Ollama, Anthropic API, or Claude Code
+- **A Claude skill** (`.claude/skills/mishnah/`) for interactive formatting in Claude Code
 
 ## The Style
 
@@ -20,20 +24,44 @@ Key conventions:
 - **~8 Hebrew words per line**, broken at natural syntactic joints
 - **Deep-linking anchors** on every perek and mishna
 
-## Using the Skill
+## Scripts
 
-### In Claude Code
+### Download source text
 
 ```bash
-# Clone and point Claude Code at the skill
-git clone https://github.com/YOUR_USERNAME/mishnah-style.git
-cd mishnah-style
-claude  # the skill will be available automatically
+python3 scripts/download.py masechet Berakhot   # single tractate
+python3 scripts/download.py seder Zeraim         # full seder
+python3 scripts/download.py shas                  # all of Shas
 ```
 
-### In Cowork
+Downloads raw JSON from Sefaria API v3 to `sefaria/{seder}/{tractate}/`, one file per chapter, with a `manifest.jsonl` logging URLs and timestamps.
 
-Install `mishnah-style.skill` from the repo's releases, or install the skill folder directly from the project.
+### Format into HTML
+
+```bash
+# Local model via Ollama
+python3 scripts/format.py masechet Berakhot --backend ollama --model gemma4:31B
+
+# Anthropic API
+export ANTHROPIC_API_KEY=sk-ant-...
+python3 scripts/format.py masechet Berakhot --backend anthropic
+
+# Claude Code headless
+python3 scripts/format.py masechet Berakhot --backend claude-code
+
+# Single chapter for testing
+python3 scripts/format.py masechet Berakhot --chapter 1
+```
+
+Output goes to `output/`. Progress tracking shows completion percentage and ETA.
+
+## Using the Claude Code Skill
+
+```bash
+git clone https://github.com/mig2/mishnah-style.git
+cd mishnah-style
+claude  # the skill is available automatically
+```
 
 ## Masechot
 

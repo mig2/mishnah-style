@@ -562,7 +562,9 @@ def main():
     html = build_html(masechet_he, all_chapters, git_sha, date.today().isoformat())
 
     filename = MASECHET_FILENAMES.get(tractate, tractate.lower())
-    out_path = os.path.join(args.dir, "masechot", f"{filename}.html")
+    out_dir = os.path.join(args.dir, "output")
+    os.makedirs(out_dir, exist_ok=True)
+    out_path = os.path.join(out_dir, f"{filename}.html")
     with open(out_path, "w") as f:
         f.write(html)
 
