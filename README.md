@@ -69,6 +69,21 @@ python3 scripts/verify.py shas --report output/report   # with JSON + HTML repor
 
 Compares words in `masechot/*.html` against the downloaded Sefaria JSON to detect hallucinated, missing, or altered text. With `--report PATH`, writes `PATH.json` (structured data) and `PATH.html` (styled report with summary table and per-mishna diffs).
 
+### Fix errors
+
+```bash
+# Programmatic fixes only (single-word replacements)
+python3 scripts/fix.py --report output/report.json
+
+# Programmatic + LLM regen for hallucinated mishnayot
+python3 scripts/fix.py --report output/report.json --backend anthropic
+
+# Preview without changing files
+python3 scripts/fix.py --report output/report.json --dry-run
+```
+
+Reads a verification report and classifies each error as programmatic (single-word replacement — wrong consonant, ending, etc.) or regen (missing/hallucinated text needing LLM re-formatting). Without `--backend`, only programmatic fixes are applied.
+
 ## Using the Claude Code Skill
 
 ```bash
