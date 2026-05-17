@@ -94,71 +94,16 @@ claude  # the skill is available automatically
 
 ## Masechot
 
-| Masechet | Skill Version | Generated |
-| --- | --- | --- |
-| [Brachot](masechot/brachot.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-13 |
-| [Peah](masechot/peah.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-13 |
-| [Demai](masechot/demai.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-13 |
-| [Kilayim](masechot/kilayim.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-13 |
-| [Sheviit](masechot/sheviit.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-13 |
-| [Terumot](masechot/terumot.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-13 |
-| [Maaserot](masechot/maaserot.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-13 |
-| [Maaser Sheni](masechot/maaser-sheni.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-13 |
-| [Challah](masechot/challah.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-13 |
-| [Orlah](masechot/orlah.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-13 |
-| [Bikkurim](masechot/bikkurim.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-13 |
-| [Shabbat](masechot/shabbat.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-13 |
-| [Eruvin](masechot/eruvin.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-13 |
-| [Pesachim](masechot/pesachim.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-13 |
-| [Shekalim](masechot/shekalim.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-13 |
-| [Yoma](masechot/yoma.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-13 |
-| [Sukkah](masechot/sukkah.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-13 |
-| [Beitzah](masechot/beitzah.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-13 |
-| [Rosh Hashanah](masechot/rosh-hashanah.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-13 |
-| [Taanit](masechot/taanit.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-13 |
-| [Megillah](masechot/megillah.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-13 |
-| [Moed Katan](masechot/moed-katan.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-13 |
-| [Chagigah](masechot/chagigah.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-13 |
-| [Yevamot](masechot/yevamot.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-13 |
-| [Ketubot](masechot/ketubot.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-13 |
-| [Nedarim](masechot/nedarim.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-13 |
-| [Nazir](masechot/nazir.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-13 |
-| [Sotah](masechot/sotah.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-13 |
-| [Gittin](masechot/gittin.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-13 |
-| [Kiddushin](masechot/kiddushin.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-13 |
-| [Bava Kamma](masechot/bava-kamma.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-14 |
-| [Bava Metzia](masechot/bava-metzia.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-14 |
-| [Bava Batra](masechot/bava-batra.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-14 |
-| [Sanhedrin](masechot/sanhedrin.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-14 |
-| [Makkot](masechot/makkot.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-14 |
-| [Shevuot](masechot/shevuot.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-14 |
-| [Eduyot](masechot/eduyot.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-14 |
-| [Avodah Zarah](masechot/avodah-zarah.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-14 |
-| [Avot](masechot/avot.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-14 |
-| [Horayot](masechot/horayot.html) | [`b43da09`](https://github.com/mig2/mishnah-style/tree/b43da09/.claude/skills/mishnah) | 2026-04-14 |
-| [Zevachim](masechot/zevachim.html) | [`3508f92`](https://github.com/mig2/mishnah-style/tree/3508f92/.claude/skills/mishnah) | 2026-04-20 |
-| [Menachot](masechot/menachot.html) | [`3508f92`](https://github.com/mig2/mishnah-style/tree/3508f92/.claude/skills/mishnah) | 2026-04-20 |
-| [Chullin](masechot/chullin.html) | [`d0ddbf8`](https://github.com/mig2/mishnah-style/tree/d0ddbf8/.claude/skills/mishnah) | 2026-04-16 |
-| [Bekhorot](masechot/bekhorot.html) | [`d0ddbf8`](https://github.com/mig2/mishnah-style/tree/d0ddbf8/.claude/skills/mishnah) | 2026-04-16 |
-| [Arakhin](masechot/arakhin.html) | [`d0ddbf8`](https://github.com/mig2/mishnah-style/tree/d0ddbf8/.claude/skills/mishnah) | 2026-04-16 |
-| [Temurah](masechot/temurah.html) | [`d0ddbf8`](https://github.com/mig2/mishnah-style/tree/d0ddbf8/.claude/skills/mishnah) | 2026-04-16 |
-| [Keritot](masechot/keritot.html) | [`d0ddbf8`](https://github.com/mig2/mishnah-style/tree/d0ddbf8/.claude/skills/mishnah) | 2026-04-16 |
-| [Meilah](masechot/meilah.html) | [`d0ddbf8`](https://github.com/mig2/mishnah-style/tree/d0ddbf8/.claude/skills/mishnah) | 2026-04-16 |
-| [Tamid](masechot/tamid.html) | [`d0ddbf8`](https://github.com/mig2/mishnah-style/tree/d0ddbf8/.claude/skills/mishnah) | 2026-04-16 |
-| [Middot](masechot/middot.html) | [`d0ddbf8`](https://github.com/mig2/mishnah-style/tree/d0ddbf8/.claude/skills/mishnah) | 2026-04-16 |
-| [Kinnim](masechot/kinnim.html) | [`d0ddbf8`](https://github.com/mig2/mishnah-style/tree/d0ddbf8/.claude/skills/mishnah) | 2026-04-16 |
-| [Ohalot](masechot/ohalot.html) | [`a2ba912`](https://github.com/mig2/mishnah-style/tree/a2ba912/.claude/skills/mishnah) | 2026-04-17 |
-| [Makhshirin](masechot/makhshirin.html) | [`a2ba912`](https://github.com/mig2/mishnah-style/tree/a2ba912/.claude/skills/mishnah) | 2026-04-17 |
-| [Zavim](masechot/zavim.html) | [`a2ba912`](https://github.com/mig2/mishnah-style/tree/a2ba912/.claude/skills/mishnah) | 2026-04-17 |
-| [Tevul Yom](masechot/tevul-yom.html) | [`a2ba912`](https://github.com/mig2/mishnah-style/tree/a2ba912/.claude/skills/mishnah) | 2026-04-17 |
-| [Yadayim](masechot/yadayim.html) | [`a2ba912`](https://github.com/mig2/mishnah-style/tree/a2ba912/.claude/skills/mishnah) | 2026-04-17 |
-| [Uktzin](masechot/uktzin.html) | [`a2ba912`](https://github.com/mig2/mishnah-style/tree/a2ba912/.claude/skills/mishnah) | 2026-04-17 |
-| [Negaim](masechot/negaim.html) | [`a2ba912`](https://github.com/mig2/mishnah-style/tree/a2ba912/.claude/skills/mishnah) | 2026-04-19 |
-| [Parah](masechot/parah.html) | [`a2ba912`](https://github.com/mig2/mishnah-style/tree/a2ba912/.claude/skills/mishnah) | 2026-04-19 |
-| [Taharot](masechot/taharot.html) | [`a2ba912`](https://github.com/mig2/mishnah-style/tree/a2ba912/.claude/skills/mishnah) | 2026-04-19 |
-| [Mikvaot](masechot/mikvaot.html) | [`a2ba912`](https://github.com/mig2/mishnah-style/tree/a2ba912/.claude/skills/mishnah) | 2026-04-19 |
-| [Niddah](masechot/niddah.html) | [`a2ba912`](https://github.com/mig2/mishnah-style/tree/a2ba912/.claude/skills/mishnah) | 2026-04-19 |
-| [Keilim](masechot/keilim.html) | [`a2ba912`](https://github.com/mig2/mishnah-style/tree/a2ba912/.claude/skills/mishnah) | 2026-04-19 |
+All 63 masechot formatted. Last verified and corrected against Sefaria source: [`839c964`](https://github.com/mig2/mishnah-style/tree/839c964) (2026-05-17).
+
+| Seder | Masechot |
+| --- | --- |
+| Zeraim | [Brachot](masechot/brachot.html), [Peah](masechot/peah.html), [Demai](masechot/demai.html), [Kilayim](masechot/kilayim.html), [Sheviit](masechot/sheviit.html), [Terumot](masechot/terumot.html), [Maaserot](masechot/maaserot.html), [Maaser Sheni](masechot/maaser-sheni.html), [Challah](masechot/challah.html), [Orlah](masechot/orlah.html), [Bikkurim](masechot/bikkurim.html) |
+| Moed | [Shabbat](masechot/shabbat.html), [Eruvin](masechot/eruvin.html), [Pesachim](masechot/pesachim.html), [Shekalim](masechot/shekalim.html), [Yoma](masechot/yoma.html), [Sukkah](masechot/sukkah.html), [Beitzah](masechot/beitzah.html), [Rosh Hashanah](masechot/rosh-hashanah.html), [Taanit](masechot/taanit.html), [Megillah](masechot/megillah.html), [Moed Katan](masechot/moed-katan.html), [Chagigah](masechot/chagigah.html) |
+| Nashim | [Yevamot](masechot/yevamot.html), [Ketubot](masechot/ketubot.html), [Nedarim](masechot/nedarim.html), [Nazir](masechot/nazir.html), [Sotah](masechot/sotah.html), [Gittin](masechot/gittin.html), [Kiddushin](masechot/kiddushin.html) |
+| Nezikin | [Bava Kamma](masechot/bava-kamma.html), [Bava Metzia](masechot/bava-metzia.html), [Bava Batra](masechot/bava-batra.html), [Sanhedrin](masechot/sanhedrin.html), [Makkot](masechot/makkot.html), [Shevuot](masechot/shevuot.html), [Eduyot](masechot/eduyot.html), [Avodah Zarah](masechot/avodah-zarah.html), [Avot](masechot/avot.html), [Horayot](masechot/horayot.html) |
+| Kodashim | [Zevachim](masechot/zevachim.html), [Menachot](masechot/menachot.html), [Chullin](masechot/chullin.html), [Bekhorot](masechot/bekhorot.html), [Arakhin](masechot/arakhin.html), [Temurah](masechot/temurah.html), [Keritot](masechot/keritot.html), [Meilah](masechot/meilah.html), [Tamid](masechot/tamid.html), [Middot](masechot/middot.html), [Kinnim](masechot/kinnim.html) |
+| Taharot | [Kelim](masechot/keilim.html), [Ohalot](masechot/ohalot.html), [Negaim](masechot/negaim.html), [Parah](masechot/parah.html), [Taharot](masechot/taharot.html), [Mikvaot](masechot/mikvaot.html), [Niddah](masechot/niddah.html), [Makhshirin](masechot/makhshirin.html), [Zavim](masechot/zavim.html), [Tevul Yom](masechot/tevul-yom.html), [Yadayim](masechot/yadayim.html), [Uktzin](masechot/uktzin.html) |
 
 ## License
 
