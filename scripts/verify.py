@@ -68,7 +68,10 @@ def strip_nikkud(text):
 def normalize_word(word):
     """Normalize a word for comparison: strip nikkud and punctuation."""
     word = strip_nikkud(word)
-    word = word.strip('.:,;?!-–—')
+    word = word.strip('.:,;?!-–—\'"״׳')
+    # Normalize vav-yod spelling variants (plene/defective)
+    # e.g. מצוות → מצות, תורות → תרות
+    word = word.replace('וו', 'ו')
     return word
 
 
@@ -76,8 +79,11 @@ def extract_words(text):
     """Extract normalized words from source or HTML text."""
     text = re.sub(r'<[^>]+>', '', text)
     text = text.replace('—', ' ')
+    # Strip all quote variants: Hebrew gershayim and ASCII quotes
     text = text.replace('״', '')
     text = text.replace('׳', '')
+    text = text.replace('"', '')
+    text = text.replace("'", '')
     text = re.sub(r'\([^)]*\)', '', text)
     text = re.sub(r'[:.;?!,]', ' ', text)
     text = ' '.join(text.split())
