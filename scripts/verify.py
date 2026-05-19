@@ -430,19 +430,36 @@ tr.err td a {{ color: #a33; }}
 # Main
 # ---------------------------------------------------------------------------
 
+def parse_ref(ref_str):
+    """Parse --ref string into (chapter, mishna) tuple. Either may be None."""
+    if not ref_str:
+        return None, None
+    if ':' in ref_str:
+        parts = ref_str.split(':')
+        return int(parts[0]), int(parts[1])
+    return int(ref_str), None
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Verify formatted HTML against Sefaria source JSON")
-    parser.add_argument("scope", choices=["masechet", "shas"],
+    parser.add_argument("scope", choices=["masechet", "seder", "shas"],
                         help="What to verify")
     parser.add_argument("name", nargs="?", default=None,
-                        help="Tractate name (not needed for shas)")
-    parser.add_argument("--chapter", type=int, default=None,
-                        help="Verify only this chapter")
+                        help="Tractate or seder name (not needed for shas)")
+    parser.add_argument("--ref", default=None,
+                        help="Limit scope: chapter (e.g. 3) or "
+                             "chapter:mishna (e.g. 3:5). Masechet only.")
     parser.add_argument("--report", default=None,
                         help="Write reports to PATH.json and PATH.html")
     parser.add_argument("--dir", default=".", help="Base directory")
     args = parser.parse_args()
+
+    ref_chapter, ref_mishna = parse_ref(args.ref)
+
+    if args.ref and args.scope != "masechet":
+        print("ERROR: --ref only works with masechet scope", file=sys.stderr)
+        sys.exit(1)
 
     results = []
 
@@ -455,11 +472,28 @@ def main():
             print(f"Unknown tractate: {args.name}", file=sys.stderr)
             sys.exit(1)
         seder, tractate, num_chapters = result
-        chapters = [args.chapter] if args.chapter else None
+        chapters = [ref_chapter] if ref_chapter else None
 
         print(f"Verifying {tractate}")
         tr = verify_tractate(seder, tractate, num_chapters, chapters, args.dir)
         results.append(tr)
+
+    elif args.scope == "seder":
+        if not args.name:
+            print("Usage: verify.py seder <name>", file=sys.stderr)
+            sys.exit(1)
+        seder_name = args.name.capitalize()
+        if seder_name not in SEDARIM:
+            print(f"Unknown seder: {args.name}", file=sys.stderr)
+            sys.exit(1)
+        print(f"Verifying Seder {seder_name}:")
+        for tractate, num_chapters in SEDARIM[seder_name]:
+            print(f"  {tractate}...", end=" ", flush=True)
+            tr = verify_tractate(seder_name, tractate, num_chapters,
+                                 base_dir=args.dir)
+            errors = tr["errors"]
+            print(f"{'✓' if errors == 0 else f'✗ {errors} errors'}")
+            results.append(tr)
 
     elif args.scope == "shas":
         for seder, tractates in SEDARIM.items():

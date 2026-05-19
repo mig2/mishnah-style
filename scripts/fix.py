@@ -1,28 +1,28 @@
 #!/usr/bin/env python3
-"""Fix verification errors in formatted HTML files.
+"""Fix verification errors, outputting JSON corrections.
 
 Usage:
-    # Fix from a verification report
-    python3 scripts/fix.py --report output/keilim-report.json
+    # Programmatic fixes only (no LLM needed)
+    python3 scripts/fix.py --report output/shas-report.json
 
-    # Fix with LLM re-generation (for hallucinated mishnayot)
-    python3 scripts/fix.py --report output/keilim-report.json --backend anthropic
+    # Programmatic + LLM regen
+    python3 scripts/fix.py --report output/shas-report.json --backend anthropic
 
-    # Dry run — show what would be fixed without changing files
-    python3 scripts/fix.py --report output/keilim-report.json --dry-run
+    # Preview without writing
+    python3 scripts/fix.py --report output/shas-report.json --dry-run
 
 Reads a verification report JSON, classifies each error as:
-    - programmatic: single-word replacements (wrong consonant, ending, etc.)
-    - regen: missing mishnayot, inserted/deleted words, multi-word changes
+    - programmatic: single-word replacements, inserts, deletes
+    - regen: missing mishnayot, multi-word changes (needs LLM)
 
-Programmatic fixes are applied directly. Regen fixes require an LLM backend
-(same options as format.py: ollama, anthropic, claude-code).
+Outputs JSON files to output/ in the same format as format.py:
+    {"tractate": "...", "mishnayot": [{"perek": N, "mishna": M, "formatted": "..."}]}
 
-Without --backend, only programmatic fixes are applied and regen items are
-listed for manual review.
+Use merge.py to apply the corrections into masechot/*.html.
 """
 
 import argparse
+import difflib
 import json
 import os
 import re
@@ -42,10 +42,7 @@ from format import (load_style_guides, build_system_prompt, build_user_prompt,
 # ---------------------------------------------------------------------------
 
 def is_programmatic_diff(d):
-    """Check if a single diff is fixable programmatically.
-
-    Covers: single-word replace, single-word insert, single-word delete.
-    """
+    """Check if a single diff is fixable programmatically."""
     if d["tag"] == "replace" and len(d["source"]) == 1 and len(d["html"]) == 1:
         return True
     if d["tag"] == "insert" and len(d["html"]) == 1:
@@ -56,12 +53,7 @@ def is_programmatic_diff(d):
 
 
 def classify_diffs(diffs):
-    """Classify a mishna's diffs as 'programmatic', 'mixed', or 'regen'.
-
-    programmatic: ALL diffs are single-word (replace, insert, or delete).
-    mixed: SOME diffs are single-word, others need regen.
-    regen: NO diffs are single-word.
-    """
+    """Classify a mishna's diffs as 'programmatic', 'mixed', or 'regen'."""
     if not diffs:
         return "ok"
     has_programmatic = False
@@ -79,7 +71,7 @@ def classify_diffs(diffs):
 
 
 # ---------------------------------------------------------------------------
-# Word extraction with nikkud (for programmatic fixes)
+# Programmatic fix helpers
 # ---------------------------------------------------------------------------
 
 def extract_nikkud_words(text):
@@ -99,12 +91,8 @@ def strip_nikkud(word):
     return re.sub(r'[\u0591-\u05C7]', '', word)
 
 
-# ---------------------------------------------------------------------------
-# Programmatic fix
-# ---------------------------------------------------------------------------
-
 def find_nth_occurrence(text, word, n):
-    """Find the start position of the Nth (0-based) occurrence of word in text."""
+    """Find start position of Nth (0-based) occurrence of word in text."""
     pos = -1
     for _ in range(n + 1):
         pos = text.find(word, pos + 1)
@@ -114,17 +102,7 @@ def find_nth_occurrence(text, word, n):
 
 
 def apply_programmatic_fix(html_text, source_text):
-    """Fix single-word diffs (replace, insert, delete) in HTML mishna text.
-
-    Uses positional alignment between source and HTML word lists.
-    - replace: swap the wrong word for the right one
-    - insert: remove the extra word from the HTML
-    - delete: add the missing word into the HTML
-
-    Returns the fixed HTML text.
-    """
-    import difflib
-
+    """Fix single-word diffs in HTML mishna text using positional alignment."""
     source_nikkud = extract_nikkud_words(source_text)
     html_nikkud = extract_nikkud_words(html_text)
 
@@ -133,8 +111,6 @@ def apply_programmatic_fix(html_text, source_text):
 
     matcher = difflib.SequenceMatcher(None, source_norm, html_norm)
 
-    # Collect fixes: (type, html_word_idx, old_nikkud, new_nikkud)
-    # type: 'replace', 'insert' (remove from html), 'delete' (add to html)
     fixes = []
     for tag, i1, i2, j1, j2 in matcher.get_opcodes():
         if tag == "replace" and (i2 - i1) == 1 and (j2 - j1) == 1:
@@ -142,38 +118,28 @@ def apply_programmatic_fix(html_text, source_text):
             new = source_nikkud[i1]
             if old != new:
                 fixes.append(("replace", j1, old, new))
-
         elif tag == "insert" and (j2 - j1) == 1:
-            # Word in HTML but not in source — remove it
             extra = html_nikkud[j1]
             fixes.append(("remove", j1, extra, None))
-
         elif tag == "delete" and (i2 - i1) == 1:
-            # Word in source but not in HTML — add it
             missing = source_nikkud[i1]
-            # Insert before html position j1 (the word that follows the gap)
             fixes.append(("add", j1, None, missing))
 
     if not fixes:
         return html_text
 
     result = html_text
-
-    # Process in reverse order so earlier fixes don't shift positions
     for fix_type, word_idx, old_nikkud, new_nikkud in reversed(fixes):
         if fix_type == "replace":
-            # Count occurrences of old_nikkud before this position
             occurrence = sum(1 for i in range(word_idx) if html_nikkud[i] == old_nikkud)
             pos = find_nth_occurrence(result, old_nikkud, occurrence)
             if pos != -1:
                 result = result[:pos] + new_nikkud + result[pos + len(old_nikkud):]
 
         elif fix_type == "remove":
-            # Find and remove the extra word (plus surrounding whitespace)
             occurrence = sum(1 for i in range(word_idx) if html_nikkud[i] == old_nikkud)
             pos = find_nth_occurrence(result, old_nikkud, occurrence)
             if pos != -1:
-                # Remove the word and one space (before or after)
                 end = pos + len(old_nikkud)
                 if end < len(result) and result[end] == ' ':
                     end += 1
@@ -182,7 +148,6 @@ def apply_programmatic_fix(html_text, source_text):
                 result = result[:pos] + result[end:]
 
         elif fix_type == "add":
-            # Insert the missing word before the word at position word_idx
             if word_idx < len(html_nikkud):
                 anchor = html_nikkud[word_idx]
                 occurrence = sum(1 for i in range(word_idx) if html_nikkud[i] == anchor)
@@ -190,75 +155,9 @@ def apply_programmatic_fix(html_text, source_text):
                 if pos != -1:
                     result = result[:pos] + new_nikkud + " " + result[pos:]
             else:
-                # Append at end (missing word was at the very end)
                 result = result.rstrip() + " " + new_nikkud
 
     return result
-
-
-# ---------------------------------------------------------------------------
-# HTML patching
-# ---------------------------------------------------------------------------
-
-def patch_mishna_in_html(html_content, perek, mishna, new_text):
-    """Replace a single mishna's text content in the full HTML file."""
-    pattern = re.compile(
-        r'(<div\s+class="mishna"\s+id="m' + str(perek) + '-' + str(mishna) +
-        r'">\s*<p\s+class="mishna-label">.*?</p>\s*<p\s+class="mishna-text">\s*)'
-        r'(.*?)'
-        r'(\s*</p>\s*</div>)',
-        re.DOTALL
-    )
-    match = pattern.search(html_content)
-    if not match:
-        return None
-    return html_content[:match.start(2)] + new_text + html_content[match.end(2):]
-
-
-def insert_mishna_in_html(html_content, perek, mishna, formatted_text):
-    """Insert a missing mishna into the HTML file after the previous mishna."""
-    from format import hebrew_numeral
-    label = f"{hebrew_numeral(perek)}:{hebrew_numeral(mishna)}"
-    new_div = (
-        f'\n\n  <div class="mishna" id="m{perek}-{mishna}">\n'
-        f'    <p class="mishna-label"><a id="mishna-{perek}-{mishna}"></a>'
-        f'<b>{label}</b></p>\n'
-        f'    <p class="mishna-text">\n'
-        f'      {formatted_text}\n'
-        f'    </p>\n'
-        f'  </div>'
-    )
-
-    # Find the previous mishna or the perek header to insert after
-    prev_mishna = mishna - 1
-    if prev_mishna > 0:
-        pattern = re.compile(
-            r'(</div>)\s*(?=\n\n</div>|\n\n  <div class="mishna" id="m' +
-            str(perek) + '-' + str(mishna + 1) + r'")',
-            re.DOTALL
-        )
-        # Simpler: find the end of the previous mishna div
-        prev_pattern = re.compile(
-            r'(<div\s+class="mishna"\s+id="m' + str(perek) + '-' + str(prev_mishna) +
-            r'">.*?</div>)',
-            re.DOTALL
-        )
-        match = prev_pattern.search(html_content)
-        if match:
-            insert_pos = match.end()
-            return html_content[:insert_pos] + new_div + html_content[insert_pos:]
-
-    # Fallback: insert after perek header
-    header_pattern = re.compile(
-        r'(<h2 class="perek-title"><a id="perek-' + str(perek) + r'"></a>.*?</h2>)',
-        re.DOTALL
-    )
-    match = header_pattern.search(html_content)
-    if match:
-        insert_pos = match.end()
-        return html_content[:insert_pos] + new_div + html_content[insert_pos:]
-
-    return None
 
 
 # ---------------------------------------------------------------------------
@@ -267,7 +166,7 @@ def insert_mishna_in_html(html_content, perek, mishna, formatted_text):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Fix verification errors in formatted HTML",
+        description="Fix verification errors, output JSON corrections",
         formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--report", required=True,
                         help="Path to verification report JSON")
@@ -280,14 +179,14 @@ def main():
                         help="Ollama API base URL")
     parser.add_argument("--dir", default=".", help="Base directory")
     parser.add_argument("--dry-run", action="store_true",
-                        help="Show plan without making changes")
+                        help="Show plan without writing")
     args = parser.parse_args()
 
     with open(args.report) as f:
         report = json.load(f)
 
     # Classify all errors
-    plan = []  # list of (tractate_info, perek, mishna, category, diffs)
+    plan = []
     for tr in report["tractates"]:
         tractate = tr["tractate"]
         seder = tr["seder"]
@@ -315,15 +214,14 @@ def main():
         print("Nothing to fix.")
         return
 
-    # Summary
     programmatic = [p for p in plan if p["category"] == "programmatic"]
     mixed = [p for p in plan if p["category"] == "mixed"]
     regen = [p for p in plan if p["category"] == "regen"]
 
     print(f"Fix plan: {len(plan)} issues")
-    print(f"  {len(programmatic)} programmatic (word-level replacement)")
+    print(f"  {len(programmatic)} programmatic (word-level)")
     print(f"  {len(mixed)} mixed (some programmatic, some regen)")
-    print(f"  {len(regen)} regen (LLM re-format needed)")
+    print(f"  {len(regen)} regen (LLM needed)")
 
     if args.dry_run:
         print("\nProgrammatic fixes (html → source):")
@@ -363,29 +261,24 @@ def main():
         model = args.model or DEFAULT_MODELS[args.backend]
         print(f"\nRegen backend: {args.backend}, model: {model}")
 
-    # Group by tractate for file I/O
+    # Group by tractate
     by_tractate = {}
     for p in plan:
         by_tractate.setdefault(p["tractate"], []).append(p)
 
+    # Collect JSON output per tractate
+    output_by_tractate = {}  # tractate → list of {"perek", "mishna", "formatted"}
     total_fixed = 0
     total_skipped = 0
 
     for tractate, items in by_tractate.items():
         seder = items[0]["seder"]
-        filename = MASECHET_FILENAMES.get(tractate, tractate.lower())
-        html_path = os.path.join(args.dir, "masechot", f"{filename}.html")
-
-        with open(html_path) as f:
-            html_content = f.read()
-
-        modified = False
+        html_mishnayot = load_html_mishnayot(tractate, args.dir)
 
         for item in items:
             ref = f"{item['perek']}:{item['mishna']}"
 
             if item["category"] in ("programmatic", "mixed"):
-                # Load source text for this mishna
                 source_texts = load_source_mishnayot(
                     seder, tractate, item["perek"], args.dir)
                 if not source_texts or item["mishna"] > len(source_texts):
@@ -396,53 +289,46 @@ def main():
                 source_text = source_texts[item["mishna"] - 1]
                 source_clean = strip_sefaria_html(source_text)
 
-                # Get current HTML mishna text
-                html_mishnayot = load_html_mishnayot(tractate, args.dir)
                 key = (item["perek"], item["mishna"])
-                if key not in html_mishnayot:
-                    print(f"  ✗ {tractate} {ref} — not in HTML")
-                    total_skipped += 1
-                    continue
+                if html_mishnayot and key in html_mishnayot:
+                    old_text = html_mishnayot[key]
+                    new_text = apply_programmatic_fix(old_text, source_clean)
 
-                old_text = html_mishnayot[key]
-                # Filter to only single-word replace diffs for programmatic fix
-                prog_diffs = [d for d in item["diffs"]
-                              if is_programmatic_diff(d)]
-
-                if not prog_diffs:
-                    if item["category"] == "mixed":
-                        # No programmatic diffs to fix, skip to regen
-                        pass
-                    continue
-
-                new_text = apply_programmatic_fix(old_text, source_clean)
-
-                if new_text != old_text:
-                    result = patch_mishna_in_html(html_content, item["perek"],
-                                                  item["mishna"], new_text)
-                    if result:
-                        html_content = result
-                        modified = True
-                        diffs_desc = "; ".join(
-                            f"{' '.join(d['html'])}→{' '.join(d['source'])}"
-                            for d in prog_diffs
-                        )
+                    if new_text != old_text:
+                        output_by_tractate.setdefault(tractate, []).append({
+                            "perek": item["perek"],
+                            "mishna": item["mishna"],
+                            "formatted": new_text,
+                        })
+                        prog_diffs = [d for d in item["diffs"] if is_programmatic_diff(d)]
+                        parts = []
+                        for d in prog_diffs:
+                            if d["tag"] == "replace":
+                                parts.append(f"{d['html'][0]}→{d['source'][0]}")
+                            elif d["tag"] == "insert":
+                                parts.append(f"remove «{d['html'][0]}»")
+                            elif d["tag"] == "delete":
+                                parts.append(f"add «{d['source'][0]}»")
                         tag = " (mixed)" if item["category"] == "mixed" else ""
-                        print(f"  ✓ {tractate} {ref}{tag} — {diffs_desc}")
+                        print(f"  ✓ {tractate} {ref}{tag} — {'; '.join(parts)}")
                         total_fixed += 1
                     else:
-                        print(f"  ✗ {tractate} {ref} — could not patch HTML")
-                        total_skipped += 1
+                        print(f"  - {tractate} {ref} — no change needed")
                 else:
-                    print(f"  - {tractate} {ref} — no change needed")
+                    print(f"  ✗ {tractate} {ref} — not in HTML")
+                    total_skipped += 1
 
-            elif item["category"] == "regen":
+            if item["category"] in ("regen", "mixed"):
+                # Check if there are regen diffs remaining
+                regen_diffs = [d for d in item["diffs"] if not is_programmatic_diff(d)]
+                if not regen_diffs and item["status"] != "missing":
+                    continue
+
                 if not args.backend:
                     print(f"  ⊘ {tractate} {ref} — regen needed (no --backend)")
                     total_skipped += 1
                     continue
 
-                # Load source text
                 source_texts = load_source_mishnayot(
                     seder, tractate, item["perek"], args.dir)
                 if not source_texts or item["mishna"] > len(source_texts):
@@ -463,31 +349,32 @@ def main():
                                             user_prompt, model, args.base_url)
                     formatted = clean_llm_response(response)
 
-                    if item["status"] == "missing":
-                        result = insert_mishna_in_html(
-                            html_content, item["perek"], item["mishna"],
-                            formatted)
-                    else:
-                        result = patch_mishna_in_html(
-                            html_content, item["perek"], item["mishna"],
-                            formatted)
-
-                    if result:
-                        html_content = result
-                        modified = True
-                        print("✓")
-                        total_fixed += 1
-                    else:
-                        print("✗ could not patch")
-                        total_skipped += 1
+                    output_by_tractate.setdefault(tractate, []).append({
+                        "perek": item["perek"],
+                        "mishna": item["mishna"],
+                        "formatted": formatted,
+                    })
+                    print("✓")
+                    total_fixed += 1
                 except RuntimeError as e:
                     print(f"✗ {e}")
                     total_skipped += 1
 
-        if modified:
-            with open(html_path, "w") as f:
-                f.write(html_content)
-            print(f"  Written: {html_path}")
+    # Write JSON output per tractate
+    if output_by_tractate:
+        out_dir = os.path.join(args.dir, "output")
+        os.makedirs(out_dir, exist_ok=True)
+
+        for tractate, mishnayot in output_by_tractate.items():
+            filename = MASECHET_FILENAMES.get(tractate, tractate.lower())
+            out_path = os.path.join(out_dir, f"{filename}-fixes.json")
+            output = {
+                "tractate": tractate,
+                "mishnayot": mishnayot,
+            }
+            with open(out_path, "w") as f:
+                json.dump(output, f, indent=2, ensure_ascii=False)
+            print(f"  Written: {out_path} ({len(mishnayot)} corrections)")
 
     print(f"\nDone: {total_fixed} fixed, {total_skipped} skipped")
 

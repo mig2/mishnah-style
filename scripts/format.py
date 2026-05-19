@@ -2,24 +2,13 @@
 """Format downloaded Sefaria JSON into styled HTML using an LLM.
 
 Usage:
-    # Ollama (local)
-    python3 scripts/format.py masechet Berakhot --backend ollama
-    python3 scripts/format.py masechet Berakhot --backend ollama --model gemma4:31B
-
-    # Anthropic API
     python3 scripts/format.py masechet Berakhot --backend anthropic
-    python3 scripts/format.py masechet Berakhot --backend anthropic --model claude-sonnet-4-20250514
-
-    # Claude Code headless
-    python3 scripts/format.py masechet Berakhot --backend claude-code
-
-    # Common options
-    python3 scripts/format.py masechet Berakhot --chapter 3    # single chapter
-    python3 scripts/format.py masechet Berakhot --dry-run      # no LLM calls
+    python3 scripts/format.py masechet Berakhot --ref 3:5 --backend ollama
+    python3 scripts/format.py seder Zeraim --backend claude-code
+    python3 scripts/format.py shas --backend anthropic --dry-run
 
 Reads raw JSON from sefaria/{seder}/{tractate}/, sends each mishna to
-an LLM for editorial formatting, and assembles the result into a single
-HTML file in masechot/.
+an LLM for editorial formatting, and writes JSON output to output/.
 
 Backends:
     ollama      Local Ollama instance (default: gemma3:27b on localhost:11434)
@@ -237,19 +226,15 @@ def call_claude_code(system_prompt, user_prompt):
             "  npm install -g @anthropic-ai/claude-code")
 
 
-# ---------------------------------------------------------------------------
-# Backend dispatcher
-# ---------------------------------------------------------------------------
-
 DEFAULT_MODELS = {
     "ollama": "gemma3:27b",
     "anthropic": "claude-sonnet-4-20250514",
-    "claude-code": None,  # uses whatever claude CLI defaults to
+    "claude-code": None,
 }
 
 
 def call_backend(backend, system_prompt, user_prompt, model, base_url):
-    """Dispatch to the chosen backend. Returns raw response text."""
+    """Dispatch to the chosen backend."""
     if backend == "ollama":
         return call_ollama(system_prompt, user_prompt, model, base_url)
     elif backend == "anthropic":
@@ -308,15 +293,6 @@ def get_masechet_he(seder, tractate, base_dir="."):
 # Progress tracking
 # ---------------------------------------------------------------------------
 
-def count_total_mishnayot(seder, tractate, chapters, base_dir="."):
-    """Count total mishnayot across all chapters to format."""
-    total = 0
-    for ch in chapters:
-        texts = load_chapter_json(seder, tractate, ch, base_dir)
-        total += len(texts)
-    return total
-
-
 def format_progress(done, total, start_time):
     """Return a progress string like [14/79 18% 2.3s/m ETA 2m30s]."""
     pct = (done / total * 100) if total else 0
@@ -329,119 +305,80 @@ def format_progress(done, total, start_time):
 
 
 # ---------------------------------------------------------------------------
-# HTML assembly
+# Parse --ref
 # ---------------------------------------------------------------------------
 
-def build_html(masechet_he, chapters_data, git_sha, today):
-    """Assemble the full HTML file from formatted chapter data."""
-    num_chapters = len(chapters_data)
+def parse_ref(ref_str):
+    """Parse --ref string into (chapter, mishna) tuple. Either may be None."""
+    if not ref_str:
+        return None, None
+    if ':' in ref_str:
+        parts = ref_str.split(':')
+        return int(parts[0]), int(parts[1])
+    return int(ref_str), None
 
-    toc_links = []
-    for i in range(1, num_chapters + 1):
-        toc_links.append(f'<a href="#perek-{i}">{hebrew_numeral(i)}</a>')
-    toc = ' <span class="sep">·</span> '.join(toc_links)
 
-    pereks_html = []
-    for ch_num, mishnayot in enumerate(chapters_data, 1):
-        ordinal = ORDINALS[ch_num] if ch_num < len(ORDINALS) else str(ch_num)
-        mishna_divs = []
-        for m_num, formatted_text in enumerate(mishnayot, 1):
-            label = f"{hebrew_numeral(ch_num)}:{hebrew_numeral(m_num)}"
-            mishna_divs.append(f"""  <div class="mishna" id="m{ch_num}-{m_num}">
-    <p class="mishna-label"><a id="mishna-{ch_num}-{m_num}"></a><b>{label}</b></p>
-    <p class="mishna-text">
-      {formatted_text}
-    </p>
-  </div>""")
+# ---------------------------------------------------------------------------
+# Core: format a single tractate
+# ---------------------------------------------------------------------------
 
-        pereks_html.append(f"""<div class="perek" id="perek{ch_num}">
-  <h2 class="perek-title"><a id="perek-{ch_num}"></a>פרק {ordinal}</h2>
+def format_tractate(seder, tractate, num_chapters, ref_chapter, ref_mishna,
+                    system_prompt, backend, model, base_url, base_dir=".",
+                    dry_run=False):
+    """Format a tractate (or subset). Returns list of mishna dicts.
 
-{"".join(chr(10) + chr(10) + m for m in mishna_divs)}
+    Each dict: {"perek": int, "mishna": int, "formatted": str}
+    """
+    chapters = [ref_chapter] if ref_chapter else list(range(1, num_chapters + 1))
 
-</div>""")
+    results = []
+    done = 0
+    total = 0
+    # Count total
+    for ch in chapters:
+        raw = load_chapter_json(seder, tractate, ch, base_dir)
+        if ref_mishna:
+            total += 1
+        else:
+            total += len(raw)
 
-    return f"""<!DOCTYPE html>
-<html lang="he" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="mishnah-style-version" content="{git_sha}">
-  <meta name="formatted-date" content="{today}">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>מסכת {masechet_he}</title>
-  <style>
-    body {{
-      font-family: "SBL Hebrew", "Frank Ruehl CLM", "Ezra SIL", "David CLM",
-                   "Noto Serif Hebrew", "Times New Roman", serif;
-      font-size: 1.2rem;
-      line-height: 2;
-      max-width: 42em;
-      margin: 2em auto;
-      padding: 0 1.5em;
-      background: #fdfdfa;
-      color: #1a1a1a;
-    }}
+    start_time = time.time()
 
-    h1.masechet-title {{
-      text-align: center;
-      font-size: 2rem;
-      margin-bottom: 0.3em;
-    }}
+    for ch in chapters:
+        raw_mishnayot = load_chapter_json(seder, tractate, ch, base_dir)
+        print(f"  Chapter {ch} ({len(raw_mishnayot)} mishnayot)")
 
-    nav.toc {{
-      text-align: center;
-      margin-bottom: 2em;
-      font-size: 1.15rem;
-      letter-spacing: 0.15em;
-    }}
-    nav.toc a {{
-      color: #2a5a8a;
-      text-decoration: none;
-      margin: 0 0.15em;
-    }}
-    nav.toc a:hover {{
-      text-decoration: underline;
-    }}
-    nav.toc .sep {{
-      color: #999;
-      margin: 0 0.05em;
-    }}
+        for m_idx, raw_text in enumerate(raw_mishnayot, 1):
+            if ref_mishna and m_idx != ref_mishna:
+                continue
 
-    .perek {{
-      margin-bottom: 2.5em;
-    }}
-    h2.perek-title {{
-      font-size: 1.5rem;
-      margin-bottom: 0.8em;
-      border-bottom: 1px solid #ccc;
-      padding-bottom: 0.3em;
-    }}
+            label = f"{hebrew_numeral(ch)}:{hebrew_numeral(m_idx)}"
 
-    .mishna {{
-      margin-bottom: 1.5em;
-    }}
-    .mishna-label {{
-      font-size: 1.05rem;
-      margin-bottom: 0.2em;
-    }}
-    .mishna-text {{
-      margin: 0;
-    }}
-  </style>
-</head>
-<body>
+            if dry_run:
+                print(f"    {label}: {raw_text[:60]}...")
+                done += 1
+                continue
 
-<h1 class="masechet-title"><a id="top"></a>מסכת {masechet_he}</h1>
+            progress = format_progress(done, total, start_time) if done > 0 else ""
+            print(f"    {label} {progress}...", end=" ", flush=True)
 
-<nav class="toc">
-  {toc}
-</nav>
+            try:
+                response = call_backend(backend, system_prompt,
+                                        build_user_prompt(raw_text, ch, m_idx),
+                                        model, base_url)
+                formatted = clean_llm_response(response)
+                results.append({
+                    "perek": ch,
+                    "mishna": m_idx,
+                    "formatted": formatted,
+                })
+                done += 1
+                print("✓")
+            except RuntimeError as e:
+                print(f"✗\n    ERROR: {e}", file=sys.stderr)
+                done += 1
 
-{chr(10).join(pereks_html)}
-
-</body>
-</html>
-"""
+    return results
 
 
 # ---------------------------------------------------------------------------
@@ -456,12 +393,13 @@ def main():
   ollama       Local Ollama instance (default model: gemma3:27b)
   anthropic    Anthropic Messages API (default model: claude-sonnet-4-20250514)
   claude-code  Claude Code CLI headless mode (uses CLI default model)""")
-    parser.add_argument("scope", choices=["masechet"],
+    parser.add_argument("scope", choices=["masechet", "seder", "shas"],
                         help="What to format")
-    parser.add_argument("name", help="Tractate name")
+    parser.add_argument("name", nargs="?", default=None,
+                        help="Tractate or seder name (not needed for shas)")
     parser.add_argument("--ref", default=None,
-                        help="Limit scope: chapter number (e.g. 3) or "
-                             "chapter:mishna (e.g. 3:5)")
+                        help="Limit scope: chapter (e.g. 3) or "
+                             "chapter:mishna (e.g. 3:5). Masechet only.")
     parser.add_argument("--backend", choices=["ollama", "anthropic", "claude-code"],
                         default="ollama", help="LLM backend (default: ollama)")
     parser.add_argument("--model", default=None,
@@ -473,148 +411,96 @@ def main():
                         help="Print raw text, no LLM calls")
     args = parser.parse_args()
 
-    # Resolve model default
     model = args.model or DEFAULT_MODELS[args.backend]
+    ref_chapter, ref_mishna = parse_ref(args.ref)
 
-    result = resolve_tractate(args.name)
-    if not result:
-        print(f"Unknown tractate: {args.name}", file=sys.stderr)
+    if args.ref and args.scope != "masechet":
+        print("ERROR: --ref only works with masechet scope", file=sys.stderr)
         sys.exit(1)
-    seder, tractate, num_chapters = result
 
-    # Parse --ref
-    ref_chapter = None
-    ref_mishna = None
-    if args.ref:
-        if ':' in args.ref:
-            parts = args.ref.split(':')
-            ref_chapter = int(parts[0])
-            ref_mishna = int(parts[1])
-        else:
-            ref_chapter = int(args.ref)
-    chapters = [ref_chapter] if ref_chapter else list(range(1, num_chapters + 1))
+    # Pre-flight checks
+    if not args.dry_run:
+        if args.backend == "anthropic" and not os.environ.get("ANTHROPIC_API_KEY"):
+            print("ERROR: ANTHROPIC_API_KEY not set.", file=sys.stderr)
+            sys.exit(1)
+        if args.backend == "claude-code":
+            try:
+                subprocess.run(["claude", "--version"], capture_output=True, check=True)
+            except (FileNotFoundError, subprocess.CalledProcessError):
+                print("ERROR: claude not found on PATH.", file=sys.stderr)
+                sys.exit(1)
 
     # Load style context
     editorial_guide, exemplar = load_style_guides()
     system_prompt = build_system_prompt(editorial_guide, exemplar)
 
-    # Pre-flight checks
-    if args.backend == "anthropic" and not os.environ.get("ANTHROPIC_API_KEY"):
-        print("ERROR: ANTHROPIC_API_KEY not set. Export it before running:\n"
-              "  export ANTHROPIC_API_KEY=sk-ant-...", file=sys.stderr)
-        sys.exit(1)
-    if args.backend == "claude-code":
-        try:
-            subprocess.run(["claude", "--version"], capture_output=True, check=True)
-        except (FileNotFoundError, subprocess.CalledProcessError):
-            print("ERROR: claude not found on PATH. Install Claude Code:\n"
-                  "  npm install -g @anthropic-ai/claude-code", file=sys.stderr)
+    # Build list of (seder, tractate, num_chapters) to process
+    targets = []
+    if args.scope == "masechet":
+        if not args.name:
+            print("Usage: format.py masechet <name>", file=sys.stderr)
             sys.exit(1)
+        result = resolve_tractate(args.name)
+        if not result:
+            print(f"Unknown tractate: {args.name}", file=sys.stderr)
+            sys.exit(1)
+        targets.append(result)
 
-    masechet_he = get_masechet_he(seder, tractate, args.dir)
-    if ref_mishna:
-        total = 1
-    else:
-        total = count_total_mishnayot(seder, tractate, chapters, args.dir)
+    elif args.scope == "seder":
+        if not args.name:
+            print("Usage: format.py seder <name>", file=sys.stderr)
+            sys.exit(1)
+        seder_name = args.name.capitalize()
+        if seder_name not in SEDARIM:
+            print(f"Unknown seder: {args.name}", file=sys.stderr)
+            sys.exit(1)
+        for tractate, chapters in SEDARIM[seder_name]:
+            targets.append((seder_name, tractate, chapters))
 
-    print(f"Formatting {tractate} ({masechet_he})")
-    scope_desc = args.ref if args.ref else f"chapters {chapters[0]}-{chapters[-1]}"
-    print(f"  {scope_desc}, {total} mishnayot")
-    print(f"  Backend: {args.backend}" +
-          (f", model: {model}" if model else ""))
+    elif args.scope == "shas":
+        for seder_name, tractates in SEDARIM.items():
+            for tractate, chapters in tractates:
+                targets.append((seder_name, tractate, chapters))
 
-    done = 0
-    start_time = time.time()
-    all_chapters = []
+    print(f"Backend: {args.backend}" + (f", model: {model}" if model else ""))
+    print(f"Targets: {len(targets)} tractate(s)")
 
-    for ch in chapters:
-        raw_mishnayot = load_chapter_json(seder, tractate, ch, args.dir)
-        print(f"\n  Chapter {ch} ({len(raw_mishnayot)} mishnayot)")
+    # Process each tractate
+    all_results = {}  # tractate → list of mishna dicts
+    start = time.time()
 
-        formatted_mishnayot = []
-        for m_idx, raw_text in enumerate(raw_mishnayot, 1):
-            label = f"{hebrew_numeral(ch)}:{hebrew_numeral(m_idx)}"
-
-            # Skip mishnayot outside --ref scope
-            if ref_mishna and m_idx != ref_mishna:
-                formatted_mishnayot.append(None)  # placeholder
-                continue
-
-            if args.dry_run:
-                print(f"    {label}: {raw_text[:60]}...")
-                formatted_mishnayot.append(raw_text)
-                done += 1
-                continue
-
-            progress = format_progress(done, total, start_time) if done > 0 else ""
-            print(f"    {label} {progress}...", end=" ", flush=True)
-
-            try:
-                response = call_backend(args.backend, system_prompt,
-                                        build_user_prompt(raw_text, ch, m_idx),
-                                        model, args.base_url)
-                formatted = clean_llm_response(response)
-                formatted_mishnayot.append(formatted)
-                done += 1
-                print("✓")
-            except RuntimeError as e:
-                print(f"✗\n    ERROR: {e}", file=sys.stderr)
-                formatted_mishnayot.append(raw_text)  # fallback to raw
-                done += 1
-
-        all_chapters.append(formatted_mishnayot)
-
-    elapsed = time.time() - start_time
+    for seder, tractate, num_chapters in targets:
+        print(f"\n{tractate}:")
+        mishnayot = format_tractate(
+            seder, tractate, num_chapters, ref_chapter, ref_mishna,
+            system_prompt, args.backend, model, args.base_url,
+            args.dir, args.dry_run)
+        if mishnayot:
+            all_results[tractate] = mishnayot
 
     if args.dry_run:
         print("\nDry run complete — no output generated.")
         return
 
-    # Single-mishna mode: output just the formatted text fragment
-    if ref_mishna:
-        formatted_texts = [t for t in all_chapters[0] if t is not None]
-        if formatted_texts:
-            filename = MASECHET_FILENAMES.get(tractate, tractate.lower())
-            out_dir = os.path.join(args.dir, "output")
-            os.makedirs(out_dir, exist_ok=True)
-            out_path = os.path.join(out_dir,
-                                    f"{filename}_{ref_chapter}_{ref_mishna}.txt")
-            with open(out_path, "w") as f:
-                f.write(formatted_texts[0])
-
-            mins, secs = divmod(int(elapsed), 60)
-            print(f"\nDone in {mins}m{secs:02d}s")
-            print(f"  Written: {out_path}")
-        return
-
-    # Full/chapter mode: assemble complete HTML
-    try:
-        git_sha = subprocess.check_output(
-            ["git", "rev-parse", "--short", "HEAD"],
-            cwd=args.dir, text=True
-        ).strip()
-    except Exception:
-        git_sha = "unknown"
-
-    # Filter out None placeholders (shouldn't happen in full mode, but safe)
-    clean_chapters = []
-    for ch_data in all_chapters:
-        clean_chapters.append([t for t in ch_data if t is not None])
-
-    html = build_html(masechet_he, clean_chapters, git_sha, date.today().isoformat())
-
-    filename = MASECHET_FILENAMES.get(tractate, tractate.lower())
+    # Write JSON output per tractate
     out_dir = os.path.join(args.dir, "output")
     os.makedirs(out_dir, exist_ok=True)
-    out_path = os.path.join(out_dir, f"{filename}.html")
-    with open(out_path, "w") as f:
-        f.write(html)
 
-    total_mishnayot = sum(len(ch) for ch in clean_chapters)
+    for tractate, mishnayot in all_results.items():
+        filename = MASECHET_FILENAMES.get(tractate, tractate.lower())
+        out_path = os.path.join(out_dir, f"{filename}-formatted.json")
+        output = {
+            "tractate": tractate,
+            "mishnayot": mishnayot,
+        }
+        with open(out_path, "w") as f:
+            json.dump(output, f, indent=2, ensure_ascii=False)
+        print(f"  Written: {out_path} ({len(mishnayot)} mishnayot)")
+
+    elapsed = time.time() - start
+    total = sum(len(m) for m in all_results.values())
     mins, secs = divmod(int(elapsed), 60)
-    print(f"\nDone in {mins}m{secs:02d}s")
-    print(f"  {len(clean_chapters)} chapters, {total_mishnayot} mishnayot")
-    print(f"  Written: {out_path}")
+    print(f"\nDone in {mins}m{secs:02d}s — {total} mishnayot across {len(all_results)} tractate(s)")
 
 
 if __name__ == "__main__":

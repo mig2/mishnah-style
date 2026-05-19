@@ -26,63 +26,65 @@ Key conventions:
 
 ## Scripts
 
+All scripts accept `masechet <name>`, `seder <name>`, or `shas` as scope. Use `--ref` to target a chapter (3) or mishna (3:5).
+
+### Pipeline
+
+```
+download.py  → sefaria/*.json     (raw source from Sefaria)
+format.py    → output/*.json      (LLM-formatted mishnayot)
+verify.py    → output/*.json/html (verification report)
+fix.py       → output/*.json      (corrections)
+merge.py     → masechot/*.html    (applies JSON into HTML files)
+```
+
 ### Download source text
 
 ```bash
-python3 scripts/download.py masechet Berakhot   # single tractate
-python3 scripts/download.py seder Zeraim         # full seder
-python3 scripts/download.py shas                  # all of Shas
+python3 scripts/download.py masechet Berakhot
+python3 scripts/download.py seder Zeraim
+python3 scripts/download.py shas
 ```
 
-Downloads raw JSON from Sefaria API v3 to `sefaria/{seder}/{tractate}/`, one file per chapter, with a `manifest.jsonl` logging URLs and timestamps.
-
-### Format into HTML
+### Format into JSON
 
 ```bash
-# Local model via Ollama
-python3 scripts/format.py masechet Berakhot --backend ollama --model gemma4:31B
-
-# Anthropic API
-export ANTHROPIC_API_KEY=sk-ant-...
 python3 scripts/format.py masechet Berakhot --backend anthropic
-
-# Claude Code headless
-python3 scripts/format.py masechet Berakhot --backend claude-code
-
-# Single chapter
-python3 scripts/format.py masechet Berakhot --ref 3
-
-# Single mishna
-python3 scripts/format.py masechet Berakhot --ref 3:5
+python3 scripts/format.py masechet Berakhot --ref 3:5 --backend ollama
+python3 scripts/format.py seder Zeraim --backend claude-code
+python3 scripts/format.py shas --backend anthropic
 ```
 
-Output goes to `output/`. Progress tracking shows completion percentage and ETA.
+Backends: `ollama` (local), `anthropic` (API, needs `ANTHROPIC_API_KEY`), `claude-code` (headless CLI).
 
 ### Verify against source
 
 ```bash
-python3 scripts/verify.py masechet Berakhot            # single tractate
-python3 scripts/verify.py masechet Berakhot --chapter 3 # single chapter
-python3 scripts/verify.py shas                          # all of Shas
-python3 scripts/verify.py shas --report output/report   # with JSON + HTML reports
+python3 scripts/verify.py masechet Berakhot
+python3 scripts/verify.py masechet Berakhot --ref 3
+python3 scripts/verify.py seder Zeraim
+python3 scripts/verify.py shas --report output/report
 ```
 
-Compares words in `masechot/*.html` against the downloaded Sefaria JSON to detect hallucinated, missing, or altered text. With `--report PATH`, writes `PATH.json` (structured data) and `PATH.html` (styled report with summary table and per-mishna diffs).
+With `--report PATH`, writes `PATH.json` (for fix.py) and `PATH.html` (human-readable).
 
 ### Fix errors
 
 ```bash
-# Programmatic fixes only (single-word replacements)
-python3 scripts/fix.py --report output/report.json
-
-# Programmatic + LLM regen for hallucinated mishnayot
-python3 scripts/fix.py --report output/report.json --backend anthropic
-
-# Preview without changing files
-python3 scripts/fix.py --report output/report.json --dry-run
+python3 scripts/fix.py --report output/report.json                      # programmatic only
+python3 scripts/fix.py --report output/report.json --backend anthropic  # + LLM regen
+python3 scripts/fix.py --report output/report.json --dry-run            # preview
 ```
 
-Reads a verification report and classifies each error as programmatic (single-word replacement — wrong consonant, ending, etc.) or regen (missing/hallucinated text needing LLM re-formatting). Without `--backend`, only programmatic fixes are applied.
+### Merge into HTML
+
+```bash
+python3 scripts/merge.py output/keilim-fixes.json
+python3 scripts/merge.py output/keilim-formatted.json
+python3 scripts/merge.py output/*.json
+```
+
+Only `merge.py` writes to `masechot/`. Handles both patching existing mishnayot and inserting missing ones.
 
 ## Using the Claude Code Skill
 
