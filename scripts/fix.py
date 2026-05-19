@@ -80,7 +80,8 @@ def extract_nikkud_words(text):
     text = text.replace('—', ' ')
     text = text.replace('״', '')
     text = text.replace('׳', '')
-    text = re.sub(r'\([^)]*\)', '', text)
+    # Strip parentheses as punctuation (keep words inside)
+    text = text.replace('(', ' ').replace(')', ' ')
     text = re.sub(r'[:.;?!,]', ' ', text)
     words = [w.strip('.:,;?!-–—') for w in text.split()]
     return [w for w in words if w]

@@ -103,7 +103,8 @@ def extract_words(text):
     text = text.replace('׳', '')
     text = text.replace('"', '')
     text = text.replace("'", '')
-    text = re.sub(r'\([^)]*\)', '', text)
+    # Strip parentheses as punctuation (keep the words inside)
+    text = text.replace('(', ' ').replace(')', ' ')
     text = re.sub(r'[:.;?!,]', ' ', text)
     text = ' '.join(text.split())
     words = [normalize_word(w) for w in text.split()]
