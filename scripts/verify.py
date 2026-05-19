@@ -88,7 +88,13 @@ def extract_words(text):
     text = re.sub(r'[:.;?!,]', ' ', text)
     text = ' '.join(text.split())
     words = [normalize_word(w) for w in text.split()]
-    return [w for w in words if w]
+    words = [w for w in words if w]
+    # Strip colophons from end (סליק מסכת ..., הדרן עלך ...)
+    for i, w in enumerate(words):
+        if w in ('סליק', 'הדרן'):
+            words = words[:i]
+            break
+    return words
 
 
 def diff_words(source_words, html_words):
@@ -440,13 +446,77 @@ def parse_ref(ref_str):
     return int(ref_str), None
 
 
+def verify_json_file(json_path, base_dir="."):
+    """Verify a JSON fragment file against Sefaria source.
+
+    Reads the same format as format.py/fix.py output:
+    {"tractate": "...", "mishnayot": [{"perek": N, "mishna": M, "formatted": "..."}]}
+
+    Returns a tractate result dict (same shape as verify_tractate).
+    """
+    with open(json_path) as f:
+        data = json.load(f)
+
+    tractate = data["tractate"]
+    # Resolve seder
+    from download import resolve_tractate as _resolve
+    result = _resolve(tractate)
+    if not result:
+        print(f"  ✗ Unknown tractate in JSON: {tractate}", file=sys.stderr)
+        return {"tractate": tractate, "seder": "unknown", "chapters": {},
+                "total": 0, "errors": 1}
+
+    seder = result[0]
+    tractate_result = {
+        "tractate": tractate,
+        "seder": seder,
+        "chapters": {},
+        "total": 0,
+        "errors": 0,
+    }
+
+    for m in data["mishnayot"]:
+        perek = m["perek"]
+        mishna_num = m["mishna"]
+        formatted = m["formatted"]
+
+        source_texts = load_source_mishnayot(seder, tractate, perek, base_dir)
+        if source_texts is None or mishna_num > len(source_texts):
+            r = {"mishna": mishna_num, "status": "no_source", "diffs": []}
+            tractate_result["chapters"].setdefault(perek, []).append(r)
+            tractate_result["total"] += 1
+            tractate_result["errors"] += 1
+            continue
+
+        source_text = source_texts[mishna_num - 1]
+        source_words = extract_words(source_text)
+        html_words = extract_words(formatted)
+        diffs = diff_words(source_words, html_words)
+
+        r = {
+            "mishna": mishna_num,
+            "status": "error" if diffs else "ok",
+            "diffs": diffs,
+        }
+        tractate_result["chapters"].setdefault(perek, []).append(r)
+        tractate_result["total"] += 1
+        if diffs:
+            tractate_result["errors"] += 1
+
+    return tractate_result
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Verify formatted HTML against Sefaria source JSON")
     parser.add_argument("scope", choices=["masechet", "seder", "shas"],
+                        nargs="?", default=None,
                         help="What to verify")
     parser.add_argument("name", nargs="?", default=None,
                         help="Tractate or seder name (not needed for shas)")
+    parser.add_argument("--json", default=None,
+                        help="Verify a JSON fragment file (from format.py or fix.py) "
+                             "against Sefaria source")
     parser.add_argument("--ref", default=None,
                         help="Limit scope: chapter (e.g. 3) or "
                              "chapter:mishna (e.g. 3:5). Masechet only.")
@@ -454,6 +524,30 @@ def main():
                         help="Write reports to PATH.json and PATH.html")
     parser.add_argument("--dir", default=".", help="Base directory")
     args = parser.parse_args()
+
+    # --json mode: verify a fragment file, no scope needed
+    if args.json:
+        if not os.path.exists(args.json):
+            print(f"ERROR: {args.json} not found", file=sys.stderr)
+            sys.exit(1)
+        print(f"Verifying JSON: {args.json}")
+        tr = verify_json_file(args.json, args.dir)
+        results = [tr]
+
+        print_results(results)
+        if args.report:
+            write_json_report(results, args.report + ".json")
+            write_html_report(results, args.report + ".html")
+
+        total_errors = sum(t["errors"] for t in results)
+        if total_errors > 0:
+            sys.exit(1)
+        return
+
+    # Scope-based mode
+    if not args.scope:
+        print("ERROR: provide a scope (masechet/seder/shas) or --json", file=sys.stderr)
+        sys.exit(1)
 
     ref_chapter, ref_mishna = parse_ref(args.ref)
 

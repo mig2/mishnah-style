@@ -102,7 +102,13 @@ When laying out lines, think about **structural parallels**. If two lines echo e
 
 **After formatting, scan for lines under 5 words and combine where syntactically natural.**
 
-## 7. Rhetorical Structure
+## 7. Colophons
+
+Drop Sefaria colophons that appear at the end of a masechet's final mishna. These are scribal/editorial markers, not part of the mishna text:
+- `סליק מסכת ...` ("end of masechet ...")
+- `הדרן עלך ...` ("we will return to you ...")
+
+## 8. Rhetorical Structure
 
 Before punctuating any mishna, identify:
 - **Case vs. ruling**: what is the scenario, what is the law?
