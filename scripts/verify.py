@@ -65,19 +65,38 @@ def strip_nikkud(text):
     return re.sub(r'[\u0591-\u05C7]', '', text)
 
 
+# Final → non-final letter mapping
+FINAL_TO_REGULAR = str.maketrans('ךםןףץ', 'כמנפצ')
+
+
+def normalize_final_letters(word):
+    """Replace final letters in non-final positions with regular forms.
+
+    Hebrew final forms (ך,ם,ן,ף,ץ) should only appear at end of word.
+    A final form mid-word is a tokenization error.
+    """
+    if len(word) <= 1:
+        return word
+    # Only fix non-final positions (all except the last character)
+    return word[:-1].translate(FINAL_TO_REGULAR) + word[-1]
+
+
 def normalize_word(word):
-    """Normalize a word for comparison: strip nikkud and punctuation."""
+    """Normalize a word for comparison: strip nikkud, punctuation, final letters."""
     word = strip_nikkud(word)
-    word = word.strip('.:,;?!-–—\'"״׳')
+    word = word.strip('.:,;?!-–—\'"״׳*')
     # Normalize vav-yod spelling variants (plene/defective)
-    # e.g. מצוות → מצות, תורות → תרות
     word = word.replace('וו', 'ו')
+    # Fix final letters in non-final positions
+    word = normalize_final_letters(word)
     return word
 
 
 def extract_words(text):
     """Extract normalized words from source or HTML text."""
     text = re.sub(r'<[^>]+>', '', text)
+    # Strip markdown bold markers
+    text = text.replace('**', '')
     text = text.replace('—', ' ')
     # Strip all quote variants: Hebrew gershayim and ASCII quotes
     text = text.replace('״', '')

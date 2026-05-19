@@ -91,6 +91,56 @@ def strip_nikkud(word):
     return re.sub(r'[\u0591-\u05C7]', '', word)
 
 
+# Final → non-final letter mapping
+FINAL_TO_REGULAR = str.maketrans('ךםןףץ', 'כמנפצ')
+
+
+def fix_final_letters_in_word(word):
+    """Fix final letters in non-final positions within a word.
+
+    Handles words with nikkud: strips nikkud to find consonant positions,
+    fixes the consonants, then reconstructs with nikkud.
+    """
+    if len(word) <= 1:
+        return word
+    # Find positions of consonants (non-nikkud characters)
+    consonant_positions = []
+    for i, c in enumerate(word):
+        if not ('\u0591' <= c <= '\u05C7'):
+            consonant_positions.append(i)
+    if len(consonant_positions) <= 1:
+        return word
+    # Check all consonant positions except the last for final forms
+    result = list(word)
+    last_consonant_pos = consonant_positions[-1]
+    for pos in consonant_positions[:-1]:  # skip last consonant
+        c = result[pos]
+        if c in 'ךםןףץ':
+            result[pos] = c.translate(FINAL_TO_REGULAR)
+    return ''.join(result)
+
+
+def fix_final_letters_in_html(html_text):
+    """Fix final letters appearing mid-word throughout HTML text.
+
+    Preserves HTML tags, only fixes within text content.
+    """
+    # Split on HTML tags, fix text segments, rejoin
+    parts = re.split(r'(<[^>]+>)', html_text)
+    for i, part in enumerate(parts):
+        if not part.startswith('<'):
+            # Text segment — fix each word
+            words = part.split(' ')
+            fixed = []
+            for w in words:
+                if w:
+                    fixed.append(fix_final_letters_in_word(w))
+                else:
+                    fixed.append(w)
+            parts[i] = ' '.join(fixed)
+    return ''.join(parts)
+
+
 def find_nth_occurrence(text, word, n):
     """Find start position of Nth (0-based) occurrence of word in text."""
     pos = -1
@@ -103,6 +153,9 @@ def find_nth_occurrence(text, word, n):
 
 def apply_programmatic_fix(html_text, source_text):
     """Fix single-word diffs in HTML mishna text using positional alignment."""
+    # Pre-pass: fix final letters mid-word (ן→נ, ך→כ, etc.)
+    html_text = fix_final_letters_in_html(html_text)
+
     source_nikkud = extract_nikkud_words(source_text)
     html_nikkud = extract_nikkud_words(html_text)
 

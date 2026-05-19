@@ -59,6 +59,7 @@ Bold **all rabbinic attributions**:
 - Named rabbis: **רַבִּי עֲקִיבָא**, **רַבָּן גַּמְלִיאֵל**, **בֶּן עַזַּאי**
 - Collective bodies: **חֲכָמִים**, **שִׁבְעִים וּשְׁנַיִם זָקֵן** (the Sanhedrin), **בֵּית דִּין**
 - Bold ONLY the name — never include the verb. Write `<b>רַבִּי שִׁמְעוֹן</b> אוֹמֵר:` not `<b>רַבִּי שִׁמְעוֹן אוֹמֵר</b>:`
+- Use HTML `<b>` tags ONLY. Never use markdown `**` bold syntax.
 
 ## 3. Quotation Marks
 
@@ -70,7 +71,11 @@ Do NOT put quotation marks around rabbinic dialogue or debate (אָמַר לוֹ
 
 ## 4. Italics
 
-Italicize ONLY direct Tanakh quotations. Keep biblical references (book/chapter) outside the italics.
+Italicize ONLY direct Tanakh quotations using HTML `<i>` tags. Never use markdown `*` or `_` italic syntax.
+
+Keep biblical references (book/chapter) in parentheses outside the italics, exactly as they appear in the source text. Do not strip, reformat, or remove parenthesized references.
+  ✓ `<i>דָּם יִהְיֶה זֹבָהּ בִּבְשָׂרָהּ</i> (ויקרא טו)`
+  ✗ `<i>דָּם יִהְיֶה זֹבָהּ בִּבְשָׂרָהּ</i> ויקרא טו` (missing parentheses)
 
 ## 5. כֵּיצַד Structure
 
