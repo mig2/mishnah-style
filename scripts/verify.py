@@ -103,8 +103,35 @@ def extract_words(text):
     text = text.replace('׳', '')
     text = text.replace('"', '')
     text = text.replace("'", '')
-    # Strip parentheses as punctuation (keep the words inside)
-    text = text.replace('(', ' ').replace(')', ' ')
+    # Handle parenthesized content:
+    # 1. Strip biblical references entirely (they're Sefaria's editorial annotations)
+    # 2. Keep textual glosses (actual mishna text marked as variants)
+    # Work on nikkud-stripped copy to match book names, then remove from original
+    def is_biblical_ref(paren_content):
+        """Check if parenthesized content is a biblical reference."""
+        s = strip_nikkud(paren_content)
+        # Book names (including שם for "ibid")
+        books = ('בראשית','שמות','ויקרא','במדבר','דברים','יהושע','שופטים',
+                 'שמואל','מלכים','ישעיה','ירמיה','יחזקאל','הושע','יואל',
+                 'עמוס','עובדיה','יונה','מיכה','נחום','חבקוק','צפניה','חגי',
+                 'זכריה','מלאכי','תהלים','תהילים','משלי','איוב','שיר','רות',
+                 'איכה','קהלת','אסתר','דניאל','עזרא','נחמיה','דברי הימים',
+                 'דה"א','דה"ב','שם')
+        return any(b in s for b in books)
+
+    # Find and handle parenthesized groups
+    result_parts = []
+    last_end = 0
+    for m in re.finditer(r'\([^)]+\)', text):
+        result_parts.append(text[last_end:m.start()])
+        if is_biblical_ref(m.group()):
+            result_parts.append(' ')  # replace ref with space
+        else:
+            # Keep the words, strip the parens
+            result_parts.append(' ' + m.group()[1:-1] + ' ')
+        last_end = m.end()
+    result_parts.append(text[last_end:])
+    text = ''.join(result_parts)
     text = re.sub(r'[:.;?!,]', ' ', text)
     text = ' '.join(text.split())
     words = [normalize_word(w) for w in text.split()]

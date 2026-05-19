@@ -123,6 +123,16 @@ Before punctuating any mishna, identify:
 
 Use line breaks, punctuation, and em-dashes to make these structures visually clear. The reader should be able to see the logic of the mishna from the layout alone.
 
+## 9. Output format
+
+- Use HTML tags ONLY: `<b>`, `<i>`, `<br>`. Never use markdown syntax (`**`, `*`, `_`).
+- Preserve the source text EXACTLY. Do not add, remove, or change any words. This includes:
+  - Do NOT drop conjunctive vavs (וְ) when adding full stops between opinions.
+  - Do NOT substitute divine name forms (do not change ה to יי or vice versa).
+  - Do NOT expand compressed text from other textual traditions.
+  - Do NOT normalize plural endings (keep ים if source has ים, keep ין if source has ין).
+- Preserve parenthesized content from the source as-is: `(ויקרא ה)`, `(אף הרוצה)`, etc.
+
 ## Exemplar
 
 See `.claude/skills/mishnah/references/exemplar-zevachim-1.html` for a gold-standard formatted perek (Zevachim chapter 1, 4 mishnayot). Study how every rule is applied in practice.
