@@ -4,12 +4,19 @@ A house style for Mishnah text — clear punctuation, elegant layout, and struct
 
 This repo contains:
 
-- **[Formatted masechot](masechot/)** — one HTML file per masechet, all 63 tractates
-- **[Editorial style guide](docs/editorial-style.md)** — the authoritative formatting rules
-- **[HTML format spec](docs/html-format.md)** — HTML structure, anchors, CSS conventions
-- **Scripts** for downloading source text and formatting via LLM:
+- **[Formatted masechot](masechot/)** — one HTML file per masechet, all 63 tractates, verified clean against Sefaria
+- **Documentation**:
+  - [Editorial style guide](docs/editorial-style.md) — the authoritative formatting rules
+  - [HTML format spec](docs/html-format.md) — HTML structure, anchors, CSS conventions
+  - [How verification works](docs/how-verify-works.md) — normalization pipeline and comparison logic
+  - [Verification report](docs/verification-report.md) — error categories found and lessons learned
+- **Scripts** — full pipeline for downloading, formatting, verifying, fixing, and merging:
   - `scripts/download.py` — fetch raw JSON from Sefaria API
-  - `scripts/format.py` — format JSON→HTML using Ollama, Anthropic API, or Claude Code
+  - `scripts/format.py` — format JSON using Ollama, Anthropic API, or Claude Code
+  - `scripts/verify.py` — cross-check HTML against Sefaria source
+  - `scripts/fix.py` — programmatic fixes + LLM regen for errors
+  - `scripts/merge.py` — apply JSON corrections into HTML files
+  - `scripts/update-readme.py` — regenerate masechot table from meta tags
 - **A Claude skill** (`.claude/skills/mishnah/`) for interactive formatting in Claude Code
 
 ## The Style
@@ -96,7 +103,7 @@ claude  # the skill is available automatically
 
 ## Masechot
 
-All 63 masechot formatted. Last verified and corrected against Sefaria source: [`839c964`](https://github.com/mig2/mishnah-style/tree/839c964) (2026-05-17).
+All 63 masechot formatted. Last updated: [`44bdd8d`](https://github.com/mig2/mishnah-style/tree/44bdd8d) (2026-05-24).
 
 | Seder | Masechot |
 | --- | --- |
