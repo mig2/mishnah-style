@@ -69,16 +69,20 @@ def strip_nikkud(text):
 FINAL_TO_REGULAR = str.maketrans('ךםןףץ', 'כמנפצ')
 
 
-def normalize_final_letters(word):
-    """Replace final letters in non-final positions with regular forms.
+REGULAR_TO_FINAL = str.maketrans('כמנפצ', 'ךםןףץ')
 
-    Hebrew final forms (ך,ם,ן,ף,ץ) should only appear at end of word.
-    A final form mid-word is a tokenization error.
+
+def normalize_final_letters(word):
+    """Normalize final/non-final letter forms for comparison.
+
+    - Final forms mid-word → regular (ן mid-word → נ)
+    - Regular forms at end → final (מ at end → ם)
     """
     if len(word) <= 1:
         return word
-    # Only fix non-final positions (all except the last character)
-    return word[:-1].translate(FINAL_TO_REGULAR) + word[-1]
+    # Non-final positions: final → regular
+    # Final position: regular → final
+    return word[:-1].translate(FINAL_TO_REGULAR) + word[-1].translate(REGULAR_TO_FINAL)
 
 
 def normalize_word(word):
@@ -87,7 +91,9 @@ def normalize_word(word):
     word = word.strip('.:,;?!-–—\'"״׳*')
     # Normalize vav-yod spelling variants (plene/defective)
     word = word.replace('וו', 'ו')
-    # Fix final letters in non-final positions
+    # Normalize divine name: יי → ה (Sefaria uses יי, HTML uses ה)
+    word = word.replace('יי', 'ה')
+    # Fix final letters
     word = normalize_final_letters(word)
     return word
 

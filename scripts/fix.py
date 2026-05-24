@@ -92,15 +92,18 @@ def strip_nikkud(word):
     return re.sub(r'[\u0591-\u05C7]', '', word)
 
 
-# Final → non-final letter mapping
+# Final ↔ non-final letter mappings
 FINAL_TO_REGULAR = str.maketrans('ךםןףץ', 'כמנפצ')
+REGULAR_TO_FINAL = str.maketrans('כמנפצ', 'ךםןףץ')
 
 
 def fix_final_letters_in_word(word):
-    """Fix final letters in non-final positions within a word.
+    """Fix final/non-final letter forms in wrong positions within a word.
 
-    Handles words with nikkud: strips nikkud to find consonant positions,
-    fixes the consonants, then reconstructs with nikkud.
+    - Final forms (ך,ם,ן,ף,ץ) in non-final positions → regular forms
+    - Regular forms (כ,מ,נ,פ,צ) in final position → final forms
+
+    Handles words with nikkud: strips nikkud to find consonant positions.
     """
     if len(word) <= 1:
         return word
@@ -111,13 +114,17 @@ def fix_final_letters_in_word(word):
             consonant_positions.append(i)
     if len(consonant_positions) <= 1:
         return word
-    # Check all consonant positions except the last for final forms
     result = list(word)
     last_consonant_pos = consonant_positions[-1]
-    for pos in consonant_positions[:-1]:  # skip last consonant
+    # Fix non-final positions: final forms → regular
+    for pos in consonant_positions[:-1]:
         c = result[pos]
         if c in 'ךםןףץ':
             result[pos] = c.translate(FINAL_TO_REGULAR)
+    # Fix final position: regular forms → final
+    c = result[last_consonant_pos]
+    if c in 'כמנפצ':
+        result[last_consonant_pos] = c.translate(REGULAR_TO_FINAL)
     return ''.join(result)
 
 
@@ -142,6 +149,65 @@ def fix_final_letters_in_html(html_text):
     return ''.join(parts)
 
 
+def fix_divine_name_in_html(html_text, source_text):
+    """Fix יי↔ה divine name substitutions in HTML using source as reference.
+
+    The LLM replaces ה with יי wherever it interprets the letter as a
+    divine name reference. This function compares each word against the
+    source and reverts any יי↔ה substitution.
+
+    Works with nikkud: strips nikkud for comparison, replaces the full
+    nikkud-bearing word from the source.
+    """
+    source_nikkud = extract_nikkud_words(source_text)
+    html_nikkud = extract_nikkud_words(html_text)
+
+    source_norm = [strip_nikkud(w) for w in source_nikkud]
+    html_norm = [strip_nikkud(w) for w in html_nikkud]
+
+    def is_divine_name_diff(src_word, htm_word):
+        """Check if HTML has יי where source has ה (LLM error direction only).
+
+        Does NOT fix the reverse (source has יי, HTML has ה) because
+        that's the HTML correctly using ה where Sefaria uses יי convention.
+        """
+        if src_word == htm_word:
+            return False
+        # HTML has יי where source has ה — this is the LLM error
+        if htm_word.replace('יי', 'ה') == src_word:
+            return True
+        if src_word.replace('ה', 'יי') == htm_word:
+            return True
+        return False
+
+    import difflib
+    matcher = difflib.SequenceMatcher(None, source_norm, html_norm)
+
+    replacements = []  # (html_word_idx, old_nikkud, new_nikkud)
+    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+        if tag != "replace":
+            continue
+        if (i2 - i1) != 1 or (j2 - j1) != 1:
+            continue
+        if is_divine_name_diff(source_norm[i1], html_norm[j1]):
+            old = html_nikkud[j1]
+            new = source_nikkud[i1]
+            if old != new:
+                replacements.append((j1, old, new))
+
+    if not replacements:
+        return html_text
+
+    result = html_text
+    for word_idx, old_nikkud, new_nikkud in reversed(replacements):
+        occurrence = sum(1 for i in range(word_idx) if html_nikkud[i] == old_nikkud)
+        pos = find_nth_occurrence(result, old_nikkud, occurrence)
+        if pos != -1:
+            result = result[:pos] + new_nikkud + result[pos + len(old_nikkud):]
+
+    return result
+
+
 def find_nth_occurrence(text, word, n):
     """Find start position of Nth (0-based) occurrence of word in text."""
     pos = -1
@@ -154,8 +220,15 @@ def find_nth_occurrence(text, word, n):
 
 def apply_programmatic_fix(html_text, source_text):
     """Fix single-word diffs in HTML mishna text using positional alignment."""
-    # Pre-pass: fix final letters mid-word (ן→נ, ך→כ, etc.)
+    # Pre-pass 1: fix final letters mid-word (ן→נ, ך→כ, etc.)
     html_text = fix_final_letters_in_html(html_text)
+    # Pre-pass 2: fix divine name substitutions (יי↔ה)
+    # Run iteratively — each pass may fix alignment enabling more fixes
+    for _ in range(5):
+        fixed = fix_divine_name_in_html(html_text, source_text)
+        if fixed == html_text:
+            break
+        html_text = fixed
 
     source_nikkud = extract_nikkud_words(source_text)
     html_nikkud = extract_nikkud_words(html_text)
