@@ -84,6 +84,61 @@ def insert_mishna_in_html(html_content, perek, mishna, formatted_text):
     return None
 
 
+def perek_exists_in_html(html_content, perek):
+    """Check whether a perek div exists in the HTML."""
+    pattern = re.compile(r'<div\s+class="perek"\s+id="perek' + str(perek) + r'">')
+    return bool(pattern.search(html_content))
+
+
+def insert_perek_in_html(html_content, perek, mishnayot):
+    """Insert an entire new perek with its mishnayot into the HTML.
+
+    Also updates the TOC to include the new chapter link.
+    """
+    from format import ORDINALS, hebrew_numeral
+
+    ordinal = ORDINALS[perek] if perek < len(ORDINALS) else str(perek)
+    perek_label = hebrew_numeral(perek)
+
+    # Build mishna divs
+    mishna_divs = []
+    for m in sorted(mishnayot, key=lambda x: x["mishna"]):
+        label = f"{hebrew_numeral(perek)}:{hebrew_numeral(m['mishna'])}"
+        mishna_divs.append(
+            f'\n\n  <div class="mishna" id="m{perek}-{m["mishna"]}">\n'
+            f'    <p class="mishna-label"><a id="mishna-{perek}-{m["mishna"]}"></a>'
+            f'<b>{label}</b></p>\n'
+            f'    <p class="mishna-text">\n'
+            f'      {m["formatted"]}\n'
+            f'    </p>\n'
+            f'  </div>'
+        )
+
+    new_perek = (
+        f'\n\n<div class="perek" id="perek{perek}">\n'
+        f'  <h2 class="perek-title"><a id="perek-{perek}"></a>פרק {ordinal}</h2>'
+        f'{"".join(mishna_divs)}\n\n'
+        f'</div>'
+    )
+
+    # Insert before </body>
+    body_end = html_content.rfind('</body>')
+    if body_end == -1:
+        return None
+    html_content = html_content[:body_end] + new_perek + '\n\n' + html_content[body_end:]
+
+    # Update TOC — add the new chapter link
+    toc_link = f' <span class="sep">·</span> <a href="#perek-{perek}">{perek_label}</a>'
+    # Find the last existing TOC link and append after it
+    toc_pattern = re.compile(r'(<a href="#perek-\d+">[^<]+</a>)(\s*</nav>)')
+    match = toc_pattern.search(html_content)
+    if match:
+        html_content = (html_content[:match.end(1)] + toc_link +
+                        html_content[match.start(2):])
+
+    return html_content
+
+
 def mishna_exists_in_html(html_content, perek, mishna):
     """Check whether a mishna div exists in the HTML."""
     pattern = re.compile(
@@ -149,38 +204,66 @@ def main():
         modified = False
         print(f"\n{tractate} ({len(mishnayot)} mishnayot):")
 
-        # Sort by perek, mishna for consistent ordering
-        for m in sorted(mishnayot, key=lambda x: (x["perek"], x["mishna"])):
-            ref = f"{m['perek']}:{m['mishna']}"
+        # Group by perek to handle whole-chapter inserts
+        by_perek = {}
+        for m in mishnayot:
+            by_perek.setdefault(m["perek"], []).append(m)
 
-            if args.dry_run:
-                exists = mishna_exists_in_html(html_content, m["perek"], m["mishna"])
-                action = "patch" if exists else "insert"
-                print(f"  {action} {ref}")
+        for perek in sorted(by_perek.keys()):
+            perek_mishnayot = sorted(by_perek[perek], key=lambda x: x["mishna"])
+
+            if not perek_exists_in_html(html_content, perek):
+                # Entire chapter is missing — insert whole perek
+                if args.dry_run:
+                    for m in perek_mishnayot:
+                        print(f"  new-perek {perek}:{m['mishna']}")
+                    continue
+
+                result = insert_perek_in_html(html_content, perek, perek_mishnayot)
+                if result:
+                    html_content = result
+                    modified = True
+                    count = len(perek_mishnayot)
+                    print(f"  ✓ chapter {perek} ({count} mishnayot, new perek)")
+                    total_inserted += count
+                else:
+                    for m in perek_mishnayot:
+                        print(f"  ✗ {perek}:{m['mishna']} — insert failed (no perek)")
+                        total_failed += 1
                 continue
 
-            if mishna_exists_in_html(html_content, m["perek"], m["mishna"]):
-                result = patch_mishna_in_html(
-                    html_content, m["perek"], m["mishna"], m["formatted"])
-                if result:
-                    html_content = result
-                    modified = True
-                    print(f"  ✓ {ref} (patched)")
-                    total_patched += 1
+            # Perek exists — handle individual mishnayot
+            for m in perek_mishnayot:
+                ref = f"{m['perek']}:{m['mishna']}"
+
+                if args.dry_run:
+                    exists = mishna_exists_in_html(html_content, m["perek"], m["mishna"])
+                    action = "patch" if exists else "insert"
+                    print(f"  {action} {ref}")
+                    continue
+
+                if mishna_exists_in_html(html_content, m["perek"], m["mishna"]):
+                    result = patch_mishna_in_html(
+                        html_content, m["perek"], m["mishna"], m["formatted"])
+                    if result:
+                        html_content = result
+                        modified = True
+                        print(f"  ✓ {ref} (patched)")
+                        total_patched += 1
+                    else:
+                        print(f"  ✗ {ref} — patch failed")
+                        total_failed += 1
                 else:
-                    print(f"  ✗ {ref} — patch failed")
-                    total_failed += 1
-            else:
-                result = insert_mishna_in_html(
-                    html_content, m["perek"], m["mishna"], m["formatted"])
-                if result:
-                    html_content = result
-                    modified = True
-                    print(f"  ✓ {ref} (inserted)")
-                    total_inserted += 1
-                else:
-                    print(f"  ✗ {ref} — insert failed")
-                    total_failed += 1
+                    result = insert_mishna_in_html(
+                        html_content, m["perek"], m["mishna"], m["formatted"])
+                    if result:
+                        html_content = result
+                        modified = True
+                        print(f"  ✓ {ref} (inserted)")
+                        total_inserted += 1
+                    else:
+                        print(f"  ✗ {ref} — insert failed")
+                        total_failed += 1
 
         if modified and not args.dry_run:
             with open(html_path, "w") as f:
