@@ -4,6 +4,8 @@
 
 This is a companion subsystem to the text-formatting pipeline that produces `masechot/`. It is adapted to this repo's existing conventions: the slug rules already used for masechet filenames, the deep-link anchor scheme in [`docs/html-format.md`](html-format.md), the practice of gitignoring derived artifacts, and a flat `scripts/` directory. Where this spec departs from a generic "fresh repo" layout, it is to match those conventions; the departures are called out inline.
 
+How these entities are *displayed* to a reader — the in-text overlay and the rendered entity/map/gallery views — is deliberately **not** defined here; it is a derived view, specified separately in [`docs/entities-display.md`](entities-display.md).
+
 -----
 
 ## 1. What this is, and what it is not
