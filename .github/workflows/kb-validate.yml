@@ -1,0 +1,24 @@
+name: kb-validate
+
+on:
+  push:
+    paths:
+      - "entities/**"
+      - "scripts/kb-validate.py"
+      - ".github/workflows/kb-validate.yml"
+  pull_request:
+    paths:
+      - "entities/**"
+      - "scripts/kb-validate.py"
+      - ".github/workflows/kb-validate.yml"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r entities/requirements.txt
+      - run: python3 scripts/kb-validate.py

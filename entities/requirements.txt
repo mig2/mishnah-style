@@ -1,0 +1,3 @@
+# Dependencies for the entities knowledge base tooling (scripts/kb-*.py).
+PyYAML>=6.0
+jsonschema>=4.18

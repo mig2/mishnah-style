@@ -1,0 +1,30 @@
+slug: akiva
+status: enriched
+type: tanna
+aliases: []
+names:
+  he: "רבי עקיבא"
+  en: "Rabbi Akiva"
+  variants: ["רבי עקיבא בן יוסף", "ר' עקיבא"]
+era:
+  generation: 3              # tannaitic generation — see vocab/generations.yaml
+  floruit: "early 2nd c. CE"
+  locale: ["bnei-brak"]      # slug into places/ (need not exist yet)
+relationships:               # borrowed; disputants/colleagues are DERIVED at build time
+  teachers:  ["eliezer-b-hyrcanus", "yehoshua-b-hananiah"]
+  students:  ["meir", "yehuda-b-ilai", "shimon-b-yochai"]
+  family:    []
+bio:
+  - value: "Leading tanna of the 3rd generation; foundational to the structure of the Mishnah."
+    source: wikidata
+    confidence: accepted
+    date: "2026-06-14"
+    confirmed: false
+appearances:                 # detector-populated later; a few real ones shown as fixtures
+  mishnah: ["brachot 9:5", "makkot 1:10", "avot 3:13"]
+  other:   ["Tosefta Berakhot 4:16"]
+ids:
+  wikidata_qid: Q310357
+  sefaria_slug: rabbi-akiva
+  hyman_ref: null
+  bonayich_id: null

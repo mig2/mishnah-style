@@ -1,0 +1,14 @@
+# Controlled vocabulary of regions used on places (place.geo.region). Slugs.
+
+galilee:        "The Galilee (Lower and Upper)."
+golan:          "The Golan / Gaulanitis."
+jezreel-valley: "The Jezreel Valley."
+coastal-plain:  "The Mediterranean coastal plain (incl. Sharon)."
+shephelah:      "The Shephelah (Judean lowlands)."
+judea:          "Judea / the Judean hills."
+jerusalem:      "Jerusalem and its environs."
+samaria:        "Samaria / the central highlands."
+transjordan:    "Transjordan (Peraea, the eastern bank)."
+negev:          "The Negev / southern arid zone."
+dead-sea:       "The Dead Sea basin."
+diaspora:       "Outside the Land of Israel (Bavel, Egypt, Rome, etc.)."

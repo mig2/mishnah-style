@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "person.schema.json",
+  "title": "Person",
+  "description": "A person in the Mishnah. See docs/entities-knowledge-base.md §9.1.",
+  "type": "object",
+  "required": ["slug", "status", "type", "names"],
+  "additionalProperties": false,
+  "properties": {
+    "slug": { "$ref": "#/$defs/slug" },
+    "status": { "$ref": "#/$defs/status" },
+    "type": { "enum": ["tanna", "amora", "biblical", "named-layperson", "collective"] },
+    "aliases": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/slug" },
+      "default": []
+    },
+    "names": {
+      "type": "object",
+      "required": ["he"],
+      "additionalProperties": false,
+      "properties": {
+        "he": { "type": "string", "minLength": 1 },
+        "en": { "type": "string" },
+        "variants": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "era": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "generation": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 6,
+          "description": "Tannaitic generation 1–6 — the reliable time unit."
+        },
+        "floruit": { "type": "string" },
+        "locale": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/slug" },
+          "description": "Slugs into places/."
+        }
+      }
+    },
+    "relationships": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Borrowed (Wikidata/biographical) typed edges. Disputants/colleagues are DERIVED at build time, not stored.",
+      "properties": {
+        "teachers": { "type": "array", "items": { "$ref": "#/$defs/slug" } },
+        "students": { "type": "array", "items": { "$ref": "#/$defs/slug" } },
+        "family": { "type": "array", "items": { "$ref": "#/$defs/slug" } }
+      }
+    },
+    "bio": { "type": "array", "items": { "$ref": "claim.schema.json" } },
+    "appearances": { "$ref": "#/$defs/appearances" },
+    "ids": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "wikidata_qid": { "type": ["string", "null"] },
+        "sefaria_slug": { "type": ["string", "null"] },
+        "hyman_ref": { "type": ["string", "null"] },
+        "bonayich_id": { "type": ["string", "null"] }
+      }
+    }
+  },
+  "$defs": {
+    "slug": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "status": { "enum": ["stub", "enriched", "reviewed", "confirmed"] },
+    "appearances": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mishnah": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)* \\d+:\\d+$",
+            "description": "Canonical form `{masechet-slug} {chapter}:{mishna}`, e.g. `shekalim 4:2`."
+          }
+        },
+        "other": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

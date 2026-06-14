@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "plant.schema.json",
+  "title": "Plant",
+  "description": "A plant term in the Mishnah. The primary key is the Hebrew term, not a taxon — identifications are contested claims. See docs/entities-knowledge-base.md §9.3.",
+  "type": "object",
+  "required": ["slug", "status", "term", "term_type"],
+  "additionalProperties": false,
+  "properties": {
+    "slug": { "$ref": "#/$defs/slug" },
+    "status": { "$ref": "#/$defs/status" },
+    "term": {
+      "type": "object",
+      "required": ["he"],
+      "additionalProperties": false,
+      "properties": {
+        "he": { "type": "string", "minLength": 1 },
+        "variants": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Spelling + plural + inflected forms."
+        },
+        "en_common": { "type": "string" }
+      }
+    },
+    "term_type": { "enum": ["species", "genus_or_group", "folk_category", "product", "plant_part"] },
+    "identification": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "consensus": { "enum": ["identified", "contested", "unknown"] },
+        "display_taxon": {
+          "type": "string",
+          "description": "The chosen taxon for rendering. Absent for folk_category terms (use `members`)."
+        },
+        "members": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "folk_category only: the set of member taxa, in place of a single display_taxon."
+        },
+        "candidates": {
+          "type": "array",
+          "items": { "$ref": "claim.schema.json" },
+          "description": "Identification claims. A contested term carries >1. Each value is { taxon, rank }; external ids live on the candidate, not the term."
+        }
+      }
+    },
+    "names": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Keyed to display_taxon; from botanical DBs.",
+      "properties": {
+        "botanical": { "type": "string" },
+        "family": { "type": "string" },
+        "common_en": { "type": "array", "items": { "type": "string" } },
+        "modern_he": { "type": "array", "items": { "type": "string" } },
+        "arabic": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ethnobotanical": { "type": "array", "items": { "type": "string" } },
+        "medicinal": {
+          "type": "array",
+          "items": { "$ref": "claim.schema.json" },
+          "description": "Historical/ethnobotanical, NOT medical guidance; provenance-tagged claims."
+        },
+        "halachic": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "DERIVED from the Mishnah. Keys into data/vocab/halachic-categories.yaml."
+        }
+      }
+    },
+    "media": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "photo": { "type": ["string", "null"] },
+        "illustration": { "type": ["string", "null"] }
+      }
+    },
+    "appearances": { "$ref": "#/$defs/appearances" },
+    "ids": {
+      "type": "object",
+      "description": "Term-level external ids are rare; real ids live on identification candidates.",
+      "additionalProperties": false,
+      "properties": {
+        "wikidata_qid": { "type": ["string", "null"] },
+        "gbif_id": { "type": ["string", "null"] },
+        "powo_id": { "type": ["string", "null"] }
+      }
+    }
+  },
+  "$defs": {
+    "slug": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "status": { "enum": ["stub", "enriched", "reviewed", "confirmed"] },
+    "appearances": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mishnah": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)* \\d+:\\d+$"
+          }
+        },
+        "other": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

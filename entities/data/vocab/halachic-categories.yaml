@@ -1,0 +1,21 @@
+# Controlled vocabulary of agricultural/halachic categories used on plant terms
+# (plant.usage.halachic). Derived from the Mishnah. Slugs; some coincide with
+# masechet slugs (kilayim, challah, orlah, bikkurim) but here denote the category.
+
+kilayim:       "Forbidden mixtures (diverse seeds/grafts)."
+terumah:       "Priestly heave-offering."
+maaser:        "Tithe (general)."
+maaser-dagan:  "Tithe of grain (dagan)."
+maaser-rishon: "First tithe (to the Levite)."
+maaser-sheni:  "Second tithe (eaten in Jerusalem)."
+maaser-ani:    "Poor man's tithe."
+challah:       "Dough-offering separated from bread."
+orlah:         "Fruit of a tree's first three years, forbidden."
+chadash:       "New grain, forbidden before the Omer."
+sheviit:       "Produce of the sabbatical year."
+peah:          "Corner of the field left for the poor."
+leket:         "Gleanings left for the poor."
+shichechah:    "Forgotten sheaf left for the poor."
+bikkurim:      "First fruits brought to the Temple."
+demai:         "Produce of uncertain tithing status."
+neta-revai:    "Fourth-year fruit, eaten in Jerusalem."

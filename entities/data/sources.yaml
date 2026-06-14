@@ -1,0 +1,45 @@
+# Source registry. Every claim's `source:` references a key here.
+# trust_tier: lower number == higher trust (0 == manual curation).
+# See docs/entities-knowledge-base.md §6.
+
+sefaria:
+  citation: "Sefaria, sefaria.org"
+  type: structured
+  license: public-domain          # the Mishnah text itself is PD; same source the text pipeline uses
+  trust_tier: 1                    # canonical reference/appearance source for this project
+
+wikidata:
+  citation: "Wikidata, wikidata.org"
+  type: structured
+  license: CC0
+  trust_tier: 2
+
+pleiades:
+  citation: "Pleiades: A Gazetteer of Past Places, pleiades.stoa.org"
+  type: structured
+  license: CC-BY
+  trust_tier: 1
+
+low:
+  citation: "Immanuel Löw, Die Flora der Juden, 4 vols., Vienna 1924–1934"
+  type: scholarly-prose
+  license: public-domain          # author d. 1944; pre-1929 vols PD, life+70 elapsed
+  trust_tier: 1
+
+feliks:
+  citation: "Yehuda Feliks, works on flora of rabbinic literature"
+  type: scholarly-prose
+  license: in-copyright            # reference/adjudicate only — do NOT bulk-redistribute
+  trust_tier: 1
+
+detector:
+  citation: "Mishnah entity detector (this project)"
+  type: derived
+  license: project
+  trust_tier: 3
+
+manual:
+  citation: "Manual curation"
+  type: human
+  license: project
+  trust_tier: 0

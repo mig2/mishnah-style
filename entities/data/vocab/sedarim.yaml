@@ -1,0 +1,81 @@
+# Canonical masechet vocabulary, grouped by seder.
+# `slug` matches the masechot/*.html filenames exactly — appearance refs
+# (`{slug} {chapter}:{mishna}`) are validated against this list, and resolve
+# to masechot/{slug}.html#mishna-N-M via the anchor scheme in docs/html-format.md.
+# `sefaria` is the Sefaria API name; `chapters` is the perek count.
+# Mirrors scripts/download.py SEDARIM + scripts/verify.py MASECHET_FILENAMES.
+
+Zeraim:
+  - { slug: brachot,      sefaria: Berakhot,      chapters: 9 }
+  - { slug: peah,         sefaria: Peah,          chapters: 8 }
+  - { slug: demai,        sefaria: Demai,         chapters: 7 }
+  - { slug: kilayim,      sefaria: Kilayim,       chapters: 9 }
+  - { slug: sheviit,      sefaria: Sheviit,       chapters: 10 }
+  - { slug: terumot,      sefaria: Terumot,       chapters: 11 }
+  - { slug: maaserot,     sefaria: Maasrot,       chapters: 5 }
+  - { slug: maaser-sheni, sefaria: Maaser_Sheni,  chapters: 5 }
+  - { slug: challah,      sefaria: Challah,       chapters: 4 }
+  - { slug: orlah,        sefaria: Orlah,         chapters: 3 }
+  - { slug: bikkurim,     sefaria: Bikkurim,      chapters: 4 }
+
+Moed:
+  - { slug: shabbat,       sefaria: Shabbat,       chapters: 24 }
+  - { slug: eruvin,        sefaria: Eruvin,        chapters: 10 }
+  - { slug: pesachim,      sefaria: Pesachim,      chapters: 10 }
+  - { slug: shekalim,      sefaria: Shekalim,      chapters: 8 }
+  - { slug: yoma,          sefaria: Yoma,          chapters: 8 }
+  - { slug: sukkah,        sefaria: Sukkah,        chapters: 5 }
+  - { slug: beitzah,       sefaria: Beitzah,       chapters: 5 }
+  - { slug: rosh-hashanah, sefaria: Rosh_Hashanah, chapters: 4 }
+  - { slug: taanit,        sefaria: Taanit,        chapters: 4 }
+  - { slug: megillah,      sefaria: Megillah,      chapters: 4 }
+  - { slug: moed-katan,    sefaria: Moed_Katan,    chapters: 3 }
+  - { slug: chagigah,      sefaria: Chagigah,      chapters: 3 }
+
+Nashim:
+  - { slug: yevamot,   sefaria: Yevamot,   chapters: 16 }
+  - { slug: ketubot,   sefaria: Ketubot,   chapters: 13 }
+  - { slug: nedarim,   sefaria: Nedarim,   chapters: 11 }
+  - { slug: nazir,     sefaria: Nazir,     chapters: 9 }
+  - { slug: sotah,     sefaria: Sotah,     chapters: 9 }
+  - { slug: gittin,    sefaria: Gittin,    chapters: 9 }
+  - { slug: kiddushin, sefaria: Kiddushin, chapters: 4 }
+
+Nezikin:
+  - { slug: bava-kamma,   sefaria: Bava_Kamma,   chapters: 10 }
+  - { slug: bava-metzia,  sefaria: Bava_Metzia,  chapters: 10 }
+  - { slug: bava-batra,   sefaria: Bava_Batra,   chapters: 10 }
+  - { slug: sanhedrin,    sefaria: Sanhedrin,    chapters: 11 }
+  - { slug: makkot,       sefaria: Makkot,       chapters: 3 }
+  - { slug: shevuot,      sefaria: Shevuot,      chapters: 8 }
+  - { slug: eduyot,       sefaria: Eduyot,       chapters: 8 }
+  - { slug: avodah-zarah, sefaria: Avodah_Zarah, chapters: 5 }
+  - { slug: avot,         sefaria: Avot,         chapters: 6 }
+  - { slug: horayot,      sefaria: Horayot,      chapters: 3 }
+
+Kodashim:
+  - { slug: zevachim, sefaria: Zevachim, chapters: 14 }
+  - { slug: menachot, sefaria: Menachot, chapters: 13 }
+  - { slug: chullin,  sefaria: Chullin,  chapters: 12 }
+  - { slug: bekhorot, sefaria: Bekhorot, chapters: 9 }
+  - { slug: arakhin,  sefaria: Arakhin,  chapters: 9 }
+  - { slug: temurah,  sefaria: Temurah,  chapters: 7 }
+  - { slug: keritot,  sefaria: Keritot,  chapters: 6 }
+  - { slug: meilah,   sefaria: Meilah,   chapters: 6 }
+  - { slug: tamid,    sefaria: Tamid,    chapters: 7 }
+  - { slug: middot,   sefaria: Middot,   chapters: 5 }
+  - { slug: kinnim,   sefaria: Kinnim,   chapters: 3 }
+
+Taharot:
+  - { slug: keilim,     sefaria: Kelim,      chapters: 30 }
+  - { slug: ohalot,     sefaria: Ohalot,     chapters: 18 }
+  - { slug: negaim,     sefaria: Negaim,     chapters: 14 }
+  - { slug: parah,      sefaria: Parah,      chapters: 12 }
+  - { slug: taharot,    sefaria: Taharot,    chapters: 10 }
+  - { slug: mikvaot,    sefaria: Mikvaot,    chapters: 10 }
+  - { slug: niddah,     sefaria: Niddah,     chapters: 10 }
+  - { slug: makhshirin, sefaria: Makhshirin, chapters: 6 }
+  - { slug: zavim,      sefaria: Zavim,      chapters: 5 }
+  - { slug: tevul-yom,  sefaria: Tevul_Yom,  chapters: 4 }
+  - { slug: yadayim,    sefaria: Yadayim,    chapters: 4 }
+  - { slug: uktzin,     sefaria: Oktzin,     chapters: 3 }
