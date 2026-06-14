@@ -10,6 +10,7 @@ This repo contains:
   - [HTML format spec](docs/html-format.md) — HTML structure, anchors, CSS conventions
   - [How verification works](docs/how-verify-works.md) — normalization pipeline and comparison logic
   - [Verification report](docs/verification-report.md) — error categories found and lessons learned
+  - [Entities knowledge base](docs/entities-knowledge-base.md) — design spec for an accumulating store of people, places, and plants in the Mishnah (v0, foundational)
 - **Scripts** — full pipeline for downloading, formatting, verifying, fixing, and merging:
   - `scripts/download.py` — fetch raw JSON from Sefaria API
   - `scripts/format.py` — format JSON using Ollama, Anthropic API, or Claude Code
