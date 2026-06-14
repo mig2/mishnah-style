@@ -19,7 +19,11 @@ This repo contains:
   - `scripts/fix.py` — programmatic fixes + LLM regen for errors
   - `scripts/merge.py` — apply JSON corrections into HTML files
   - `scripts/update-readme.py` — regenerate masechot table from meta tags
-- **Entities knowledge base** (`entities/`) — an accumulating store of people, places, and plants in the Mishnah ([KB spec](docs/entities-knowledge-base.md), [display spec](docs/entities-display.md)). YAML is the source of truth; `scripts/kb-validate.py` validates it against the JSON schemas and `scripts/kb-build.py` compiles it into the derived `entities/knowledge.db` (run `pip install -r entities/requirements.txt` first).
+- **Entities knowledge base** (`entities/`) — an accumulating store of people, places, and plants in the Mishnah ([KB spec](docs/entities-knowledge-base.md), [display spec](docs/entities-display.md)). YAML is the source of truth (run `pip install -r entities/requirements.txt` first):
+  - `scripts/kb-validate.py` — validate `entities/data/` against the JSON schemas + semantic cross-checks
+  - `scripts/kb-build.py` — compile the YAML into the derived `entities/knowledge.db`
+  - `scripts/kb-import-wikidata.py`, `scripts/kb-import-pleiades.py` — enrich entities from external sources (additive, idempotent; `--input` runs offline against `entities/fixtures/`)
+  - `scripts/kb-selftest.py` — assert the §8 merge-rule invariants offline
 - **A Claude skill** (`.claude/skills/mishnah/`) for interactive formatting in Claude Code
 
 ## The Style

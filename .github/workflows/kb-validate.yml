@@ -4,12 +4,12 @@ on:
   push:
     paths:
       - "entities/**"
-      - "scripts/kb-validate.py"
+      - "scripts/kb-*.py"
       - ".github/workflows/kb-validate.yml"
   pull_request:
     paths:
       - "entities/**"
-      - "scripts/kb-validate.py"
+      - "scripts/kb-*.py"
       - ".github/workflows/kb-validate.yml"
 
 jobs:
@@ -22,3 +22,5 @@ jobs:
           python-version: "3.11"
       - run: pip install -r entities/requirements.txt
       - run: python3 scripts/kb-validate.py
+      - run: python3 scripts/kb-selftest.py   # §8 merge-rule invariants (offline)
+      - run: python3 scripts/kb-build.py       # smoke: YAML compiles to knowledge.db
