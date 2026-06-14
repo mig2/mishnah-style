@@ -19,7 +19,7 @@ This repo contains:
   - `scripts/fix.py` — programmatic fixes + LLM regen for errors
   - `scripts/merge.py` — apply JSON corrections into HTML files
   - `scripts/update-readme.py` — regenerate masechot table from meta tags
-- **Entities knowledge base** (`entities/`) — an accumulating store of people, places, and plants in the Mishnah ([KB spec](docs/entities-knowledge-base.md), [display spec](docs/entities-display.md)). `scripts/kb-validate.py` validates `entities/data/` against the JSON schemas (run `pip install -r entities/requirements.txt` first).
+- **Entities knowledge base** (`entities/`) — an accumulating store of people, places, and plants in the Mishnah ([KB spec](docs/entities-knowledge-base.md), [display spec](docs/entities-display.md)). YAML is the source of truth; `scripts/kb-validate.py` validates it against the JSON schemas and `scripts/kb-build.py` compiles it into the derived `entities/knowledge.db` (run `pip install -r entities/requirements.txt` first).
 - **A Claude skill** (`.claude/skills/mishnah/`) for interactive formatting in Claude Code
 
 ## The Style
