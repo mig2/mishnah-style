@@ -21,6 +21,5 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install -r entities/requirements.txt
-      - run: python3 scripts/kb-validate.py
-      - run: python3 scripts/kb-selftest.py   # §8 merge-rule invariants (offline)
-      - run: python3 scripts/kb-build.py       # smoke: YAML compiles to knowledge.db
+      - run: python3 scripts/kb-validate.py            # gate: real data must validate
+      - run: python3 -m unittest discover -s tests -t tests -v   # full suite (D1–D7)
