@@ -1,0 +1,24 @@
+{
+  "entities": {
+    "Q12100": {
+      "id": "Q12100",
+      "labels": { "en": { "language": "en", "value": "common wheat" } },
+      "claims": {
+        "P225": [
+          {
+            "mainsnak": {
+              "datavalue": { "type": "string", "value": "Triticum aestivum" }
+            }
+          }
+        ],
+        "P105": [
+          {
+            "mainsnak": {
+              "datavalue": { "type": "wikibase-entityid", "value": { "id": "Q7432" } }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

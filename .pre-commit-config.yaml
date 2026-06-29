@@ -1,0 +1,12 @@
+# Validation is the contract: a file that does not validate does not land.
+# Install once with `pip install pre-commit && pre-commit install`.
+repos:
+  - repo: local
+    hooks:
+      - id: kb-validate
+        name: validate entities knowledge base
+        entry: python scripts/kb-validate.py
+        language: python
+        additional_dependencies: ["PyYAML>=6.0", "jsonschema>=4.18"]
+        files: ^entities/(data|schema)/.*\.(ya?ml|json)$
+        pass_filenames: false

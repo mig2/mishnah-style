@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "place.schema.json",
+  "title": "Place",
+  "description": "A place in the Mishnah. See docs/entities-knowledge-base.md §9.2.",
+  "type": "object",
+  "required": ["slug", "status", "type", "names"],
+  "additionalProperties": false,
+  "properties": {
+    "slug": { "$ref": "#/$defs/slug" },
+    "status": { "$ref": "#/$defs/status" },
+    "type": { "enum": ["settlement", "region", "temple_structure", "water_feature", "legal_domain"] },
+    "aliases": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/slug" },
+      "default": []
+    },
+    "names": {
+      "type": "object",
+      "required": ["he"],
+      "additionalProperties": false,
+      "properties": {
+        "he": { "type": "string", "minLength": 1 },
+        "en": { "type": "string" },
+        "variants": { "type": "array", "items": { "type": "string" } },
+        "classical": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Greco-Roman toponym; settlements only, often empty."
+        },
+        "modern": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "he": { "type": "string" },
+            "ar": { "type": "string" },
+            "en": { "type": "string" }
+          }
+        }
+      }
+    },
+    "geo": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "description": "null for temple_structure & legal_domain.",
+      "properties": {
+        "coordinates": {
+          "type": "array",
+          "items": { "$ref": "claim.schema.json" },
+          "description": "Claims whose value is { lat, lon }. The displayed value plus retained dissent."
+        },
+        "region": { "type": "string" },
+        "modern_admin": { "type": "string" },
+        "consensus": { "enum": ["identified", "probable", "disputed", "unknown"] }
+      }
+    },
+    "media": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "photo": { "type": ["string", "null"] },
+        "map_link": { "type": ["string", "null"] }
+      }
+    },
+    "plan": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "description": "temple_structure only.",
+      "properties": {
+        "position": { "type": "string" },
+        "source_ref": { "type": "string" },
+        "diagram_ref": { "type": "string" }
+      }
+    },
+    "appearances": { "$ref": "#/$defs/appearances" },
+    "ids": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "wikidata_qid": { "type": ["string", "null"] },
+        "pleiades_id": { "type": ["string", "null"] },
+        "geonames_id": { "type": ["string", "null"] },
+        "sefaria_slug": { "type": ["string", "null"] }
+      }
+    }
+  },
+  "$defs": {
+    "slug": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "status": { "enum": ["stub", "enriched", "reviewed", "confirmed"] },
+    "appearances": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mishnah": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)* \\d+:\\d+$"
+          }
+        },
+        "other": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

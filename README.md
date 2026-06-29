@@ -10,6 +10,8 @@ This repo contains:
   - [HTML format spec](docs/html-format.md) — HTML structure, anchors, CSS conventions
   - [How verification works](docs/how-verify-works.md) — normalization pipeline and comparison logic
   - [Verification report](docs/verification-report.md) — error categories found and lessons learned
+  - [Entities knowledge base](docs/entities-knowledge-base.md) — design spec for an accumulating store of people, places, and plants in the Mishnah (v0, foundational)
+  - [Entities display & UX](docs/entities-display.md) — how entities are rendered: the in-text color overlay and the derived entity/map/gallery views (v0, foundational)
 - **Scripts** — full pipeline for downloading, formatting, verifying, fixing, and merging:
   - `scripts/download.py` — fetch raw JSON from Sefaria API
   - `scripts/format.py` — format JSON using Ollama, Anthropic API, or Claude Code
@@ -17,6 +19,13 @@ This repo contains:
   - `scripts/fix.py` — programmatic fixes + LLM regen for errors
   - `scripts/merge.py` — apply JSON corrections into HTML files
   - `scripts/update-readme.py` — regenerate masechot table from meta tags
+- **Entities knowledge base** (`entities/`) — an accumulating store of people, places, and plants in the Mishnah ([KB spec](docs/entities-knowledge-base.md), [display spec](docs/entities-display.md)). YAML is the source of truth (run `pip install -r entities/requirements.txt` first):
+  - `scripts/kb-validate.py` — validate `entities/data/` against the JSON schemas + semantic cross-checks
+  - `scripts/kb-build.py` — compile the YAML into the derived `entities/knowledge.db`
+  - `scripts/kb-render.py` — render the static entity/index/map/gallery site into `entities/site/` (display phase 2)
+  - `scripts/kb-import-wikidata.py`, `scripts/kb-import-pleiades.py` — enrich entities from external sources (additive, idempotent; `--input` runs offline against `entities/fixtures/`)
+  - `scripts/kb-selftest.py` — quick offline smoke of the §8 merge-rule invariants
+  - `tests/` — full suite, one module per deliverable: `python3 -m unittest discover -s tests -t tests`
 - **A Claude skill** (`.claude/skills/mishnah/`) for interactive formatting in Claude Code
 
 ## The Style

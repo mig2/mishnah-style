@@ -1,0 +1,4 @@
+# Dependencies for the entities knowledge base tooling (scripts/kb-*.py).
+PyYAML>=6.0            # kb-validate, kb-build
+jsonschema>=4.18       # kb-validate
+ruamel.yaml>=0.18      # kb_lib, kb-import-*, kb-selftest (comment-preserving round-trip)

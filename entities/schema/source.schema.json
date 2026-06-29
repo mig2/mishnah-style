@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "source.schema.json",
+  "title": "Source registry",
+  "description": "Schema for data/sources.yaml as a whole: a map of source key -> source entry. Provenance fields elsewhere reference these keys. See docs/entities-knowledge-base.md §6.",
+  "type": "object",
+  "minProperties": 1,
+  "propertyNames": {
+    "pattern": "^[a-z0-9]+(?:[-_][a-z0-9]+)*$"
+  },
+  "additionalProperties": {
+    "$ref": "#/$defs/source"
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "required": ["citation", "type", "license", "trust_tier"],
+      "additionalProperties": false,
+      "properties": {
+        "citation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "enum": ["structured", "scholarly-prose", "derived", "human"]
+        },
+        "license": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Free text (e.g. CC0, CC-BY, public-domain, in-copyright, project). Determines what may be redistributed."
+        },
+        "trust_tier": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Lower number == higher trust. 0 == manual curation."
+        }
+      }
+    }
+  }
+}

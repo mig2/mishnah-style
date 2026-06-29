@@ -1,0 +1,33 @@
+slug: chitah
+status: enriched
+term:
+  he: "חיטה"
+  variants: ["חטה", "חטים", "חיטים"]    # spelling + plural forms
+  en_common: "wheat"
+term_type: species
+identification:
+  consensus: identified       # an uncontested term carries a single candidate;
+  display_taxon: "Triticum aestivum"   # a contested term (e.g. ezov) would carry >1
+  candidates:
+    - value: { taxon: "Triticum aestivum", rank: species }
+      ids: { wikidata_qid: Q12100, gbif_id: null, powo_id: null }
+      source: feliks
+      asserted_by: Feliks
+      confidence: accepted
+      confirmed: false
+names:
+  botanical: "Triticum aestivum"
+  family: "Poaceae"
+  common_en: ["bread wheat", "wheat"]
+  modern_he: ["חיטה"]
+  arabic: ["قمح"]
+usage:
+  ethnobotanical: ["food"]
+  halachic: ["kilayim", "maaser-dagan", "challah", "chadash"]   # DERIVED; see vocab/halachic-categories.yaml
+media:
+  photo: "https://commons.wikimedia.org/wiki/Category:Triticum_aestivum"
+  illustration: "https://commons.wikimedia.org/wiki/Category:Köhler%27s_Medizinal-Pflanzen"
+appearances:                  # detector-populated later; a few real ones shown as fixtures
+  mishnah: ["kilayim 1:1", "challah 1:1", "pesachim 2:5"]
+  other:   []
+ids: {}                       # term-level external ids rare; real ids live on candidates

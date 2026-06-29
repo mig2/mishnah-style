@@ -1,0 +1,32 @@
+{
+  "entities": {
+    "Q745966": {
+      "id": "Q745966",
+      "labels": { "en": { "language": "en", "value": "Sepphoris" } },
+      "claims": {
+        "P625": [
+          {
+            "mainsnak": {
+              "datavalue": {
+                "type": "globecoordinate",
+                "value": {
+                  "latitude": 32.7522,
+                  "longitude": 35.2797,
+                  "precision": 0.0001,
+                  "globe": "http://www.wikidata.org/entity/Q2"
+                }
+              }
+            }
+          }
+        ],
+        "P18": [
+          {
+            "mainsnak": {
+              "datavalue": { "type": "string", "value": "Sepphoris Cardo.jpg" }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

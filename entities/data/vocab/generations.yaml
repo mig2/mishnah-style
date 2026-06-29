@@ -1,0 +1,9 @@
+# Tannaitic generations — the reliable time unit for people (person.era.generation).
+# Approximate floruit windows; conventional scholarly numbering 1–6.
+
+1: { floruit: "c. 10–80 CE",   note: "Destruction generation; Yavne founders (Yochanan b. Zakkai, Gamliel the Elder)." }
+2: { floruit: "c. 80–110 CE",  note: "Yavne (Gamliel II, Eliezer b. Hyrcanus, Yehoshua b. Hananiah)." }
+3: { floruit: "c. 110–135 CE", note: "Pre-/Bar-Kokhba (Akiva, Tarfon, Yishmael)." }
+4: { floruit: "c. 135–170 CE", note: "Usha (Meir, Yehuda b. Ilai, Shimon b. Yochai, Yose)." }
+5: { floruit: "c. 170–200 CE", note: "Redaction generation (Yehuda ha-Nasi and colleagues)." }
+6: { floruit: "c. 200–220 CE", note: "Transitional tannaim, contemporaries of the early amoraim." }

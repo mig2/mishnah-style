@@ -1,0 +1,31 @@
+slug: tzippori
+status: enriched
+type: settlement
+aliases: []
+names:
+  he: "ציפורי"
+  en: "Tzippori"
+  variants: ["צפורי"]
+  classical: ["Sepphoris", "Diocaesarea"]
+  modern: { he: "ציפורי", ar: "صفورية", en: "Tzippori" }
+geo:
+  coordinates:               # display value plus retained dissent (one candidate here)
+    - value: { lat: 32.7522, lon: 35.2797 }
+      source: pleiades
+      confidence: accepted
+      confirmed: false
+  region: galilee            # see vocab/regions.yaml
+  modern_admin: "Israel, Northern District"
+  consensus: identified
+media:
+  photo: "https://commons.wikimedia.org/wiki/Category:Sepphoris"
+  map_link: "https://www.openstreetmap.org/?mlat=32.7522&mlon=35.2797"
+plan: null                   # settlements have no temple plan
+appearances:                 # detector-populated later
+  mishnah: []
+  other:   []
+ids:
+  wikidata_qid: Q745966
+  pleiades_id: "678378"
+  geonames_id: null
+  sefaria_slug: null

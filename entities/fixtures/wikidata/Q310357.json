@@ -1,0 +1,19 @@
+{
+  "entities": {
+    "Q310357": {
+      "id": "Q310357",
+      "labels": {
+        "en": { "language": "en", "value": "Akiva" },
+        "he": { "language": "he", "value": "רבי עקיבא" }
+      },
+      "descriptions": {
+        "en": { "language": "en", "value": "Jewish scholar and tanna (c. 50 – 135 CE)" }
+      },
+      "aliases": {
+        "en": [ { "value": "Akiva ben Joseph" }, { "value": "Rabbi Akiba" } ],
+        "he": [ { "value": "עקיבא בן יוסף" } ]
+      },
+      "claims": {}
+    }
+  }
+}
