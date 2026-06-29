@@ -22,6 +22,7 @@ This repo contains:
 - **Entities knowledge base** (`entities/`) — an accumulating store of people, places, and plants in the Mishnah ([KB spec](docs/entities-knowledge-base.md), [display spec](docs/entities-display.md)). YAML is the source of truth (run `pip install -r entities/requirements.txt` first):
   - `scripts/kb-validate.py` — validate `entities/data/` against the JSON schemas + semantic cross-checks
   - `scripts/kb-build.py` — compile the YAML into the derived `entities/knowledge.db`
+  - `scripts/kb-render.py` — render the static entity/index/map/gallery site into `entities/site/` (display phase 2)
   - `scripts/kb-import-wikidata.py`, `scripts/kb-import-pleiades.py` — enrich entities from external sources (additive, idempotent; `--input` runs offline against `entities/fixtures/`)
   - `scripts/kb-selftest.py` — quick offline smoke of the §8 merge-rule invariants
   - `tests/` — full suite, one module per deliverable: `python3 -m unittest discover -s tests -t tests`

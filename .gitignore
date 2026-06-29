@@ -6,3 +6,4 @@ output/
 # Entities KB derived artifacts (rebuilt from entities/data/ — never committed)
 entities/knowledge.db
 entities/conflicts.log
+entities/site/

@@ -60,7 +60,7 @@ masechot/*.html + DB ──kb-enrich─▶  enriched masechot     (3) mark mishn
 The order matters and is intentional:
 
 - **Phase 1 — `scripts/kb-build.py`** compiles the YAML into `knowledge.db` (per the KB spec §11). Nothing here is presentational.
-- **Phase 2 — `scripts/kb-render.py`** generates the standalone, DB-only views: one **entity page** per person/place/plant (§5), plus aggregate views — a **places map**, a **flora gallery**, and a **who's-who / index**. These never contain mishna text; they are pure projections of the KB.
+- **Phase 2 — `scripts/kb-render.py`** generates the standalone views: one **entity page** per person/place/plant (§5), plus aggregate views — a **places map**, a **flora gallery**, and a **who's-who / index**. These never contain mishna text; they are pure projections of the KB. (Implementation note: it renders from the **YAML source of truth** for full fidelity — `knowledge.db`'s §11 schema is intentionally a minimal query index and drops scalar fields like `region`, `generation`, and `halachic`. The DB stays the cross-entity query layer; per-page rendering reads the richer YAML.)
 - **Phase 3 — `scripts/kb-enrich.py`** is the *join*, and therefore last: it takes a canonical masechet plus the DB and produces an **enriched copy** in which entity mentions in the running text are wrapped, colored (under the overlay), and linked to the phase-2 entity pages. It depends on phase 2 (the link targets must exist) and on the appearance linkage (to know which mishnayot mention what).
 
 All phase-2 and phase-3 outputs are derived artifacts: gitignored, regenerable, output to a build/publish directory rather than committed over `masechot/`.
