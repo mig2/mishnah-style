@@ -23,6 +23,7 @@ This repo contains:
   - `scripts/kb-validate.py` — validate `entities/data/` against the JSON schemas + semantic cross-checks
   - `scripts/kb-build.py` — compile the YAML into the derived `entities/knowledge.db`
   - `scripts/kb-render.py` — render the static entity/index/map/gallery site into `entities/site/` (display phase 2)
+  - `scripts/kb-enrich.py` — weave the entity overlay (CSS-only per-type toggle + links) into copies of the masechot under `entities/site/read/` (display phase 3); canonical masechot are never modified
   - `scripts/kb-import-wikidata.py`, `scripts/kb-import-pleiades.py` — enrich entities from external sources (additive, idempotent; `--input` runs offline against `entities/fixtures/`)
   - `scripts/kb-selftest.py` — quick offline smoke of the §8 merge-rule invariants
   - `tests/` — full suite, one module per deliverable: `python3 -m unittest discover -s tests -t tests`
