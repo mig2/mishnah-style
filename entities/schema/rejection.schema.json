@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "rejection.schema.json",
+  "title": "Rejections",
+  "description": "Negative memory for the detector: surface forms marked 'not an entity', so re-runs suppress them. Per-mishna by default, with a global escape hatch. See docs/entities-detection.md.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["form", "kind", "scope"],
+    "additionalProperties": false,
+    "properties": {
+      "form": { "type": "string", "minLength": 1, "description": "Surface form (raw or normalized)." },
+      "kind": { "enum": ["person", "place", "plant"] },
+      "scope": { "enum": ["mishna", "global"] },
+      "ref": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)* \\d+:\\d+$",
+               "description": "Required when scope is 'mishna' — the appearance where it's rejected." },
+      "note": { "type": "string" }
+    },
+    "allOf": [
+      { "if": { "properties": { "scope": { "const": "mishna" } }, "required": ["scope"] },
+        "then": { "required": ["ref"] } }
+    ]
+  }
+}

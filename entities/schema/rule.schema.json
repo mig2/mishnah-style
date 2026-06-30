@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "rule.schema.json",
+  "title": "Disambiguation rules",
+  "description": "Resolve an ambiguous surface form (matching >1 entity) to a chosen slug. Most-specific scope wins (mishna > masechet > global). See docs/entities-detection.md.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["form", "kind", "resolve", "scope"],
+    "additionalProperties": false,
+    "properties": {
+      "form": { "type": "string", "minLength": 1 },
+      "kind": { "enum": ["person", "place", "plant"] },
+      "resolve": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$", "description": "Target entity slug." },
+      "scope": { "enum": ["global", "masechet", "mishna"] },
+      "masechet": { "type": "string", "description": "Required when scope is 'masechet'." },
+      "ref": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)* \\d+:\\d+$",
+               "description": "Required when scope is 'mishna'." },
+      "note": { "type": "string" }
+    },
+    "allOf": [
+      { "if": { "properties": { "scope": { "const": "masechet" } }, "required": ["scope"] },
+        "then": { "required": ["masechet"] } },
+      { "if": { "properties": { "scope": { "const": "mishna" } }, "required": ["scope"] },
+        "then": { "required": ["ref"] } }
+    ]
+  }
+}
