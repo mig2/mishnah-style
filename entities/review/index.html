@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entity Review</title>
+<style>
+:root{--ink:#1a1a1a;--bg:#fdfdfa;--link:#2a5a8a;--muted:#6b6b66;--rule:#e6e6df;}
+*{box-sizing:border-box;}
+body{background:var(--bg);color:var(--ink);font-family:Georgia,serif;margin:0;line-height:1.5;}
+.he{font-family:"SBL Hebrew","Frank Ruehl CLM","Noto Serif Hebrew",serif;direction:rtl;}
+header{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--rule);
+  padding:.7rem 1.2rem;display:flex;gap:1rem;align-items:center;flex-wrap:wrap;}
+header h1{font-size:1.1rem;margin:0;}
+header .counts{color:var(--muted);font-size:.85rem;}
+main{max-width:52em;margin:0 auto;padding:1.2rem;}
+h2{font-size:1rem;border-bottom:1px solid var(--rule);padding-bottom:.25rem;margin-top:2rem;}
+.item{border:1px solid var(--rule);border-radius:.5rem;padding:.8rem;margin:.7rem 0;}
+.item.accept{border-color:#2e7d32;background:#f3f9f3;}
+.item.reject{border-color:#c0392b;background:#fcf3f2;}
+.badge{font-size:.7rem;padding:.05rem .45rem;border-radius:1rem;background:#eef1f4;color:#3a4a5a;}
+.forms{font-size:1.3rem;margin:.2rem 0;}
+.refs{color:var(--muted);font-size:.8rem;margin:.2rem 0;}
+.row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-top:.5rem;}
+input,select{font:inherit;padding:.2rem .4rem;border:1px solid #ccc;border-radius:.3rem;}
+button{font:inherit;cursor:pointer;border:1px solid #ccc;border-radius:.3rem;padding:.2rem .7rem;background:#fff;}
+button.on{background:#2a5a8a;color:#fff;border-color:#2a5a8a;}
+.muted{color:var(--muted);}
+#export{position:fixed;bottom:1rem;right:1rem;background:#2a5a8a;color:#fff;border:none;
+  padding:.6rem 1rem;border-radius:.4rem;font-size:1rem;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+</style>
+</head>
+<body>
+<header>
+  <h1>Entity Review</h1>
+  <input type="file" id="file" accept="application/json">
+  <span class="counts" id="counts">load a proposals.json…</span>
+</header>
+<main>
+  <div id="proposals"></div>
+  <div id="ambiguous"></div>
+</main>
+<button id="export">Export decisions.json</button>
+
+<script>
+const TYPES = {
+  person: ["tanna","amora","biblical","named-layperson","collective"],
+  place:  ["settlement","region","temple_structure","water_feature","legal_domain"],
+  plant:  ["species","genus_or_group","folk_category","product","plant_part"],
+};
+let DATA = null;
+const decisions = { accept: {}, reject: {}, rules: {} }; // keyed for idempotent toggling
+
+document.getElementById("file").addEventListener("change", e => {
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = () => { DATA = JSON.parse(r.result); render(); };
+  r.readAsText(f);
+});
+
+function el(tag, cls, html){ const n=document.createElement(tag); if(cls)n.className=cls; if(html!=null)n.innerHTML=html; return n; }
+
+function render(){
+  const c = DATA.run && DATA.run.counts || {};
+  document.getElementById("counts").textContent =
+    `mishnayot ${c.mishnayot||0} · known ${c.known||0} · new ${c.new||0} · ambiguous ${c.ambiguous||0}`;
+
+  const box = document.getElementById("proposals");
+  box.innerHTML = "<h2>New entities</h2>";
+  for (const [norm, p] of Object.entries(DATA.proposals||{})) {
+    const item = el("div","item");
+    item.dataset.norm = norm;
+    item.append(el("span","badge",p.kind));
+    item.append(el("div","forms he",p.forms.join(" · ")));
+    item.append(el("div","refs",`${p.refs.length} appearance(s): ${p.refs.slice(0,8).join(", ")}${p.refs.length>8?"…":""}`));
+    const row = el("div","row");
+    const slug = el("input"); slug.placeholder="slug"; slug.value=p.suggested_slug||"";
+    const en = el("input"); en.placeholder = p.kind==="plant" ? "en_common" : "english";
+    const type = el("select"); TYPES[p.kind].forEach(t=>{const o=el("option",null,t);o.value=t;type.append(o);});
+    const acc = el("button",null,"✓ accept");
+    const rej = el("button",null,"✗ reject (global)");
+    acc.onclick = () => {
+      item.className = item.className==="item accept" ? "item" : "item accept";
+      if (item.className==="item accept") {
+        delete decisions.reject[norm];
+        const d = { kind:p.kind, slug:slug.value.trim(), variants:p.forms, refs:p.refs };
+        if (p.kind==="plant"){ d.term_type=type.value; d.term={he:p.forms[0], en_common:en.value.trim()||undefined}; }
+        else { d.type=type.value; d.names={he:p.forms[0], en:en.value.trim()||undefined}; }
+        decisions.accept[norm]=d;
+      } else delete decisions.accept[norm];
+    };
+    rej.onclick = () => {
+      item.className = item.className==="item reject" ? "item" : "item reject";
+      if (item.className==="item reject"){ delete decisions.accept[norm];
+        decisions.reject[norm] = { form:p.forms[0], kind:p.kind, scope:"global" }; }
+      else delete decisions.reject[norm];
+    };
+    row.append(slug,en,type,acc,rej);
+    item.append(row);
+    box.append(item);
+  }
+
+  // ambiguous grouped by form -> one rule
+  const ambBox = document.getElementById("ambiguous");
+  ambBox.innerHTML = "<h2>Ambiguous (make a rule)</h2>";
+  const byForm = {};
+  (DATA.ambiguous||[]).forEach(a => (byForm[a.form] ||= {form:a.form, kind:a.kind, candidates:a.candidates, refs:[]}).refs.push(a.ref));
+  for (const a of Object.values(byForm)) {
+    const item = el("div","item");
+    item.append(el("span","badge",a.kind));
+    item.append(el("div","forms he",a.form));
+    item.append(el("div","refs",`${a.refs.length} occurrence(s)`));
+    const row = el("div","row");
+    const pick = el("select"); a.candidates.forEach(s=>{const o=el("option",null,s);o.value=s;pick.append(o);});
+    const scope = el("select"); ["global","masechet"].forEach(s=>{const o=el("option",null,s);o.value=s;scope.append(o);});
+    const mk = el("button",null,"＋ rule");
+    mk.onclick = () => {
+      mk.classList.toggle("on");
+      if (mk.classList.contains("on")) {
+        const rule = { form:a.form, kind:a.kind, resolve:pick.value, scope:scope.value };
+        if (scope.value==="masechet") rule.masechet = (a.refs[0]||"").split(" ")[0];
+        decisions.rules[a.form]=rule;
+      } else delete decisions.rules[a.form];
+    };
+    row.append(pick,scope,mk);
+    item.append(row);
+    ambBox.append(item);
+  }
+}
+
+document.getElementById("export").onclick = () => {
+  const out = { accept:Object.values(decisions.accept), reject:Object.values(decisions.reject), rules:Object.values(decisions.rules) };
+  const blob = new Blob([JSON.stringify(out,null,2)],{type:"application/json"});
+  const a = el("a"); a.href=URL.createObjectURL(blob); a.download="decisions.json"; a.click();
+};
+</script>
+</body>
+</html>

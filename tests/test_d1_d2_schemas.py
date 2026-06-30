@@ -10,7 +10,10 @@ class TestSchemasWellFormed(unittest.TestCase):
     def test_all_schema_files_are_valid_json_schema(self):
         from jsonschema import Draft202012Validator
         files = sorted(SCHEMA.glob("*.schema.json"))
-        self.assertEqual(len(files), 5, "expected 5 schema files")
+        names = {p.name for p in files}
+        core = {"claim.schema.json", "source.schema.json", "person.schema.json",
+                "place.schema.json", "plant.schema.json"}
+        self.assertTrue(core <= names, f"missing core schemas: {core - names}")
         for p in files:
             with self.subTest(schema=p.name):
                 Draft202012Validator.check_schema(json.loads(p.read_text()))

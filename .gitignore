@@ -7,3 +7,6 @@ output/
 entities/knowledge.db
 entities/conflicts.log
 entities/site/
+entities/detect/proposals.json
+entities/detect/decisions.json
+entities/detect/runs/

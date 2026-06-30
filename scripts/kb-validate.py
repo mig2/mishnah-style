@@ -170,6 +170,13 @@ def main():
 
             report(path, errors)
 
+    # 3. durable detector artifacts (if present)
+    detect_dir = data_dir.parent / "detect"
+    for fname, schema_name in (("rejections.yaml", "rejection"), ("rules.yaml", "rule")):
+        p = detect_dir / fname
+        if p.exists():
+            report(p, schema_errors(load_yaml(p), schemas[f"{schema_name}.schema.json"], registry))
+
     total = files_ok + files_bad
     print()
     if files_bad:
