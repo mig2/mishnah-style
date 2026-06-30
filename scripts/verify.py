@@ -373,12 +373,10 @@ def write_html_report(results_list, path):
         t_errors = tr["errors"]
         t_clean = t_total - t_errors
         cls = "ok" if t_errors == 0 else "err"
-        rows.append(f'<tr class="{cls}"><td>'
-                     f'{"" if t_errors == 0 else "<a href=\"#" + tractate + "\">"}'
-                     f'{tractate}'
-                     f'{"" if t_errors == 0 else "</a>"}'
-                     f'</td><td>{t_total}</td><td>{t_clean}</td>'
-                     f'<td>{t_errors}</td></tr>')
+        name_cell = tractate if t_errors == 0 else f'<a href="#{tractate}">{tractate}</a>'
+        rows.append(f'<tr class="{cls}"><td>{name_cell}</td>'
+                    f'<td>{t_total}</td><td>{t_clean}</td>'
+                    f'<td>{t_errors}</td></tr>')
 
         if t_errors > 0:
             issues = []
