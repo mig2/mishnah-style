@@ -18,7 +18,7 @@ For each mention the engine (kb_detect.Resolver) returns:
 Output: entities/detect/proposals.json — the mishna-ordered review surface for the
 SPA. Known appearances are written straight to the entity YAML (idempotent).
 
-Requires: pyyaml. (--mode llm additionally needs a backend; not implemented here.)
+Requires: pyyaml. --mode llm needs a backend (claude-code, anthropic, or ollama).
 """
 
 import argparse
@@ -65,6 +65,63 @@ def load_yaml_list(path):
     return yaml.safe_load(Path(path).read_text(encoding="utf-8")) or []
 
 
+# --- LLM detection: ask the model to identify entities -----------------------
+
+_LLM_SYSTEM = """You are a Mishnah entity extractor. Given raw Mishnah text, identify all:
+- **people**: named rabbis, tannaim, biblical figures, any named person
+- **places**: cities, regions, geographic locations, buildings (Temple areas, etc.)
+- **plants**: crops, trees, botanical items mentioned by name
+
+Return ONLY a JSON array of objects, each with "form" (the Hebrew text as it appears) and "kind" (one of: person, place, plant). No explanation, no markdown fences.
+
+Example output:
+[{"form": "רַבִּי עֲקִיבָא", "kind": "person"}, {"form": "יְרוּשָׁלַיִם", "kind": "place"}, {"form": "חִטִּים", "kind": "plant"}]
+
+If no entities are found, return: []
+Do NOT include generic terms (e.g. "אדם", "איש", "מקום") — only specific named entities."""
+
+
+def detect_llm(masechot_dir, slugs, backend, model, base_url):
+    """Yield (ref, [(form, kind), ...]) for every mishna, using LLM extraction."""
+    from format import call_backend, DEFAULT_MODELS
+
+    if model is None:
+        model = DEFAULT_MODELS.get(backend)
+
+    for slug in slugs:
+        src = Path(masechot_dir) / f"{slug}.html"
+        if not src.exists():
+            continue
+        html = src.read_text(encoding="utf-8")
+        for ch, mi, text in _MISHNA.findall(html):
+            # Strip HTML to get plain text for the LLM
+            plain = _TAG.sub("", text).replace("—", " ").strip()
+            plain = re.sub(r"\s+", " ", plain)
+            if not plain:
+                continue
+
+            ref = f"{slug} {ch}:{mi}"
+            user_prompt = f"Extract entities from this mishna ({ref}):\n\n{plain}"
+
+            try:
+                response = call_backend(backend, _LLM_SYSTEM, user_prompt,
+                                        model, base_url)
+                # Parse JSON response
+                response = response.strip()
+                if response.startswith("```"):
+                    response = re.sub(r"^```(?:json)?\s*", "", response)
+                    response = re.sub(r"\s*```$", "", response)
+                entities = json.loads(response)
+                mentions = [(e["form"], e["kind"]) for e in entities
+                            if "form" in e and "kind" in e
+                            and e["kind"] in ("person", "place", "plant")]
+                if mentions:
+                    yield ref, mentions
+            except (json.JSONDecodeError, KeyError, RuntimeError) as exc:
+                print(f"  ⚠ {ref}: {exc}", file=sys.stderr)
+                continue
+
+
 # --- deterministic detection: bolded rabbinic names in the masechot -----------
 _MISHNA = re.compile(r'id="m(\d+)-(\d+)".*?<p class="mishna-text">(.*?)</p>', re.S)
 _BOLD = re.compile(r"<b>(.*?)</b>", re.S)
@@ -92,6 +149,8 @@ def main():
     ap = argparse.ArgumentParser(description="Detect entities mishna-by-mishna.")
     ap.add_argument("--mode", choices=["bold", "llm"], default="bold")
     ap.add_argument("--backend", help="LLM backend (anthropic/ollama/claude-code) for --mode llm")
+    ap.add_argument("--model", default=None, help="Model name (default depends on backend)")
+    ap.add_argument("--base-url", default="http://localhost:11434", help="Ollama API base URL")
     ap.add_argument("--masechet", action="append", help="limit to these masechet slug(s)")
     ap.add_argument("--data", default=str(ROOT / "entities" / "data"))
     ap.add_argument("--masechot", default=str(ROOT / "masechot"))
@@ -99,10 +158,8 @@ def main():
     ap.add_argument("--dry-run", action="store_true", help="don't write appearances back")
     args = ap.parse_args()
 
-    if args.mode == "llm":
-        sys.exit("kb-detect: --mode llm is not implemented in this environment — it needs a "
-                 "network LLM backend (reuse format.py's). Use --mode bold offline. "
-                 "See docs/entities-detection.md.")
+    if args.mode == "llm" and not args.backend:
+        args.backend = "claude-code"
 
     data_dir = Path(args.data)
     entities = load_entities(data_dir)
@@ -121,7 +178,13 @@ def main():
     appends = {}                # slug -> set(ref)  (known appearances to write)
     counts = {"mishnayot": 0, "known": 0, "new": 0, "ambiguous": 0, "suppressed": 0}
 
-    for ref, mentions in detect_bold(args.masechot, slugs):
+    if args.mode == "llm":
+        detector = detect_llm(args.masechot, slugs, args.backend,
+                              args.model, args.base_url)
+    else:
+        detector = detect_bold(args.masechot, slugs)
+
+    for ref, mentions in detector:
         counts["mishnayot"] += 1
         detected = []
         for form, kind in mentions:
