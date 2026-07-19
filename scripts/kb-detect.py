@@ -154,7 +154,9 @@ def main():
     ap.add_argument("--masechet", action="append", help="limit to these masechet slug(s)")
     ap.add_argument("--data", default=str(ROOT / "entities" / "data"))
     ap.add_argument("--masechot", default=str(ROOT / "masechot"))
-    ap.add_argument("--out", default=str(ROOT / "entities" / "detect" / "proposals.json"))
+    ap.add_argument("--out", default=None,
+                    help="Output path (default: entities/detect/proposals-{slug}.json "
+                         "per masechet, or proposals.json for multi/all)")
     ap.add_argument("--dry-run", action="store_true", help="don't write appearances back")
     args = ap.parse_args()
 
@@ -171,6 +173,15 @@ def main():
 
     slugs = args.masechet or sorted(p.stem for p in Path(args.masechot).glob("*.html")
                                     if p.stem != "index")
+
+    # Determine output path
+    detect_dir = ROOT / "entities" / "detect"
+    if args.out:
+        out_path = Path(args.out)
+    elif args.masechet and len(args.masechet) == 1:
+        out_path = detect_dir / f"proposals-{args.masechet[0]}.json"
+    else:
+        out_path = detect_dir / "proposals.json"
 
     mishnayot_out = []          # ordered review surface
     proposals = {}              # norm -> proposal (new entities, grouped)
@@ -194,7 +205,6 @@ def main():
 
     import time
     start_time = time.time()
-    out_path = Path(args.out)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     last_save = 0
 
