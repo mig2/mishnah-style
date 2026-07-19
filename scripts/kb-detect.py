@@ -178,14 +178,43 @@ def main():
     appends = {}                # slug -> set(ref)  (known appearances to write)
     counts = {"mishnayot": 0, "known": 0, "new": 0, "ambiguous": 0, "suppressed": 0}
 
+    # Count total mishnayot for progress (LLM mode)
+    total_mishnayot = 0
+    if args.mode == "llm":
+        for slug in slugs:
+            src = Path(args.masechot) / f"{slug}.html"
+            if src.exists():
+                total_mishnayot += len(_MISHNA.findall(src.read_text(encoding="utf-8")))
+
     if args.mode == "llm":
         detector = detect_llm(args.masechot, slugs, args.backend,
                               args.model, args.base_url)
     else:
         detector = detect_bold(args.masechot, slugs)
 
+    import time
+    start_time = time.time()
+    out_path = Path(args.out)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    last_save = 0
+
     for ref, mentions in detector:
         counts["mishnayot"] += 1
+        n = counts["mishnayot"]
+
+        # Progress output
+        if args.mode == "llm":
+            elapsed = time.time() - start_time
+            rate = elapsed / n if n else 0
+            remaining = rate * (total_mishnayot - n) if total_mishnayot else 0
+            mins, secs = divmod(int(remaining), 60)
+            eta = f"{mins}m{secs:02d}s" if mins else f"{secs}s"
+            entities_found = sum(1 for m in mentions)
+            print(f"  {ref} [{n}/{total_mishnayot} {n*100//total_mishnayot}% ETA {eta}] "
+                  f"+{entities_found} entities", flush=True)
+        elif n % 100 == 0:
+            print(f"  ...{n} mishnayot processed", flush=True)
+
         detected = []
         for form, kind in mentions:
             res = resolver.resolve(form, kind, ref)
@@ -214,6 +243,18 @@ def main():
             detected.append(row)
         mishnayot_out.append({"ref": ref, "detected": detected})
 
+        # Periodic save (every 20 mishnayot in LLM mode)
+        if args.mode == "llm" and n - last_save >= 20:
+            last_save = n
+            partial = {
+                "run": {"mode": args.mode, "counts": dict(counts), "partial": True},
+                "mishnayot": mishnayot_out,
+                "proposals": proposals,
+                "ambiguous": ambiguous,
+            }
+            out_path.write_text(json.dumps(partial, ensure_ascii=False, indent=2),
+                                encoding="utf-8")
+
     # count distinct new entities, not occurrences
     counts["new"] = len(proposals)
     out = {
@@ -222,8 +263,6 @@ def main():
         "proposals": proposals,
         "ambiguous": ambiguous,
     }
-    out_path = Path(args.out)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")
 
     # write known appearances back to the entity YAML (idempotent)
