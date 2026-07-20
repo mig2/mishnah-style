@@ -2,6 +2,8 @@
 __pycache__/
 sefaria/
 output/
+node_modules/
+entities/app/frontend/dist/
 
 # Entities KB derived artifacts (rebuilt from entities/data/ — never committed)
 entities/knowledge.db
