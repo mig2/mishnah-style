@@ -67,6 +67,26 @@ function render(){
 
   const box = document.getElementById("proposals");
   box.innerHTML = "<h2>New entities</h2>";
+  // Simple Hebrew-to-slug transliteration
+  const HE_MAP = {
+    'א':'a','ב':'b','ג':'g','ד':'d','ה':'h','ו':'v','ז':'z','ח':'ch','ט':'t',
+    'י':'y','כ':'k','ך':'k','ל':'l','מ':'m','ם':'m','נ':'n','ן':'n','ס':'s',
+    'ע':'a','פ':'p','ף':'f','צ':'tz','ץ':'tz','ק':'k','ר':'r','ש':'sh','ת':'t',
+  };
+  function hebrewToSlug(he) {
+    // Strip nikkud
+    let s = he.replace(/[\u0591-\u05C7]/g, "");
+    // Transliterate
+    let out = "";
+    for (const c of s) {
+      if (HE_MAP[c]) out += HE_MAP[c];
+      else if (c === " " || c === "-") out += "-";
+      // skip other chars (quotes, etc.)
+    }
+    // Collapse doubles and trim
+    return out.replace(/-+/g,"-").replace(/(.)\1+/g,"$1$1").replace(/^-|-$/g,"").toLowerCase();
+  }
+
   for (const [norm, p] of Object.entries(DATA.proposals||{})) {
     const item = el("div","item");
     item.dataset.norm = norm;
@@ -74,7 +94,7 @@ function render(){
     item.append(el("div","forms he",p.forms.join(" · ")));
     item.append(el("div","refs",`${p.refs.length} appearance(s): ${p.refs.slice(0,8).join(", ")}${p.refs.length>8?"…":""}`));
     const row = el("div","row");
-    const slug = el("input"); slug.placeholder="slug"; slug.value=p.suggested_slug||"";
+    const slug = el("input"); slug.placeholder="slug"; slug.value=p.suggested_slug||hebrewToSlug(p.forms[0])||"";
     const en = el("input"); en.placeholder = p.kind==="plant" ? "en_common" : "english";
     const type = el("select"); TYPES[p.kind].forEach(t=>{const o=el("option",null,t);o.value=t;type.append(o);});
     const acc = el("button",null,"✓ accept");
